@@ -18,7 +18,6 @@
 //TODO mycomp descending
 
 int CompareLinesAscending(const void * str1, const void * str2) {
-    puts("comare acc");
     assert(str1);
     assert(str2);
     const char *s1 = *(const char **)str1;
@@ -52,7 +51,6 @@ int CompareLinesAscending(const void * str1, const void * str2) {
 }
 
 int CompareLinesDescending(const void * str1, const void * str2) {
-    puts("comare decc");
     assert(str1);
     assert(str2);
     const char *s1 = *(const char **)str1;
@@ -96,6 +94,7 @@ int main() {
 
     FILE * file = fopen("eugene.txt", "r");
     assert(file);
+
     while ((read = getline(&line, &len, file)) != -1) {
         lines[j] = strdup(line);
         assert(lines[j]);
