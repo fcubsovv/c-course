@@ -1,0 +1,13 @@
+_______________________________________________
+Enter how many teams: 
+_______________________________________________
+Enter team number 1 name: Enter team number 2 name: Enter team number 3 name: _______________________________________________
+       a   b   c
+   a   #   0   0
+   b   0   #   0
+   c   0   0   #
+       a   b   c
+   a
+   b   0
+   c   0   0
+Entr first team, then second, then count
