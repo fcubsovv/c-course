@@ -5,8 +5,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
-
 #include "comparators.cpp"
 
 #include "../global_utils/user_string.cpp"
@@ -22,17 +20,13 @@ struct lines_array_struct {
     size_t lines_count;
 };
 
-lines_array_struct FormLinesArray(char * text, size_t nitems) {
-
-    struct lines_array_struct answer = {
-        NULL,
-        NULL
-    };
-
+lines_array_struct FormLinesArray(buffer_struct read) {
+    char * text =           read.buffer;
+    size_t nitems =         read.nitems;
     size_t lines_count = 0;
     size_t memory_tracker = 8;
     size_t previous_line_end = 0;
-
+    /// \n count
     line_struct * lines_array = (line_struct *)calloc(memory_tracker, sizeof(line_struct));
 
     lines_array[lines_count].str = &text[0];
@@ -51,7 +45,7 @@ lines_array_struct FormLinesArray(char * text, size_t nitems) {
 
                     if (lines_array == NULL) {
                         perror("Error in memory usage, cannot expand lines_array");
-                        return answer;
+                        return {};
                     }
                 }
 
@@ -63,12 +57,12 @@ lines_array_struct FormLinesArray(char * text, size_t nitems) {
         }
     }
 
-    answer = {
+    //if file finished not on \n add handling
+    return {
         lines_array,
         lines_count
     };
 
-    return answer;
 }
 
 int WriteArrayToFile(line_struct * array, size_t number_of_elements, FILE * answer_file, int puts(const char *, FILE *)) {
@@ -85,17 +79,14 @@ int WriteArrayToFile(line_struct * array, size_t number_of_elements, FILE * answ
 
 int main() {
 
-    buffer_struct read =    ReadFromFileToBuffer("test_data/eugene.txt");
-    char * text =           read.buffer;
-    size_t nitems =         read.nitems;
-
-    lines_array_struct formed_array =   FormLinesArray(text, nitems);
+    buffer_struct read = ReadFromFileToBuffer("test_data/zheka_washed.txt");///NULL check
+    lines_array_struct formed_array =   FormLinesArray(read);
     line_struct * lines_array =         formed_array.lines;
     size_t lines_count =                formed_array.lines_count;
 
     FILE * answer_file = fopen("output_file.txt", "w");
     if (   answer_file == NULL) {
-        perror("error in opening answer file occured, no such file");
+        perror("error in opening answer file occured");
     }
 
     qsort(            lines_array, lines_count, sizeof(line_struct), CompareLinesAscending);

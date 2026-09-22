@@ -17,7 +17,7 @@ struct line_struct {
     size_t position;
 };
 
-int CompareLinesAscending(const void * str1_struct, const void * str2_struct) {
+int CompareLinesAscending(const void * str1_struct, const void * str2_struct) {///readability
     if (!str1_struct) {
         perror("error in CompareLinesAscending, no str1_struct");
     }
