@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <fcntl.h>
 #include "../stringsh/user_string.cpp"
 #include "../sorting/user_qsort.cpp"
 
@@ -87,6 +88,7 @@ int main() {
     size_t len = 0;
     ssize_t read = 0;
     FILE * file = fopen("zheka_english.txt", "rb");
+
     assert(file);
     fseek(file, 0L, SEEK_END);
     size_t nitems = ftell(file);
