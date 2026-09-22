@@ -2,128 +2,119 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <ctype.h>
-#include "../stringsh/user_string.cpp"
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+
+#include "comparators.cpp"
+
+#include "../global_utils/user_string.cpp"
+#include "../global_utils/colors.cpp"
+#include "../global_utils/filework.cpp"
+#include "../global_utils/log_utils.cpp"
+
 #include "../sorting/user_qsort.cpp"
 
-#define PRINT_LINE puts("_______________________________________________");
-//TODO форматирование текста на питоне
-//TODO чтение - единым буффером
-//DONE чтение гетлайном
-//DONE компаратор для строк
-//TODO sorting by pointer value
-//TODO make asc/desc directions same func??
-//TODO comparators in a specific file
-//DONE my_comp for lines
-//TODO mycomp descending
 
-int CompareLinesAscending(const void * str1, const void * str2) {
-    assert(str1);
-    assert(str2);
-    const char *s1 = *(const char **)str1;
-    const char *s2 = *(const char **)str2;
-    int i = 0;
-    int j = 0;
-    while (1) {
-        while (s1[i] != '\n' && s1[i]!='\0'&& !isalpha((unsigned char)s1[i])) {
-            i++;
-        }
-        while (s2[j] != '\n' && s2[j]!='\0'&& !isalpha((unsigned char)s2[j])) {
-            j++;
-        }
+struct lines_array_struct {
+    line_struct * lines;
+    size_t lines_count;
+};
 
-        if ((s1[i] == '\0' || s1[i] == '\n') && (s2[j] == '\0' || s2[j] == '\n')) {
-            return 0;
+lines_array_struct FormLinesArray(char * text, size_t nitems) {
+
+    struct lines_array_struct answer = {
+        NULL,
+        NULL
+    };
+
+    size_t lines_count = 0;
+    size_t memory_tracker = 8;
+    size_t previous_line_end = 0;
+
+    line_struct * lines_array = (line_struct *)calloc(memory_tracker, sizeof(line_struct));
+
+    lines_array[lines_count].str = &text[0];
+    lines_count++;
+    for (size_t i = 1; i < nitems; i++) {
+        if (text[i] == '\n') {
+
+            lines_array[lines_count-1].length = i-previous_line_end;
+
+            if ((i+1) < nitems) {
+
+                if (lines_count >= memory_tracker) {
+
+                    memory_tracker *= 2;
+                    lines_array = (line_struct *)realloc(lines_array, memory_tracker*(sizeof(line_struct)));
+
+                    if (lines_array == NULL) {
+                        perror("Error in memory usage, cannot expand lines_array");
+                        return answer;
+                    }
+                }
+
+                lines_array[lines_count].str = &text[i+1];
+                lines_array[lines_count].position = lines_count;
+                lines_count++;
+                previous_line_end = i+1;
+            }
         }
-        if (s1[i] == '\0' || s1[i] == '\n') {
-            return -1;
-        }
-        if (s2[j] == '\0' || s2[j] == '\n') {
-            return 1;
-        }
-        if (tolower((unsigned char)s1[i]) != tolower((unsigned char)s2[j])) {
-            return tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
-        }
-        i++;
-        j++;
     }
-    return tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+
+    answer = {
+        lines_array,
+        lines_count
+    };
+
+    return answer;
 }
 
-int CompareLinesDescending(const void * str1, const void * str2) {
-    assert(str1);
-    assert(str2);
-    const char *s1 = *(const char **)str1;
-    const char *s2 = *(const char **)str2;
-    int i = strlen(s1) - 1;
-    int j = strlen(s2) - 1;
-    while (1) {
-        while (i >= 0 && !isalpha((unsigned char)s1[i])) {
-            i--;
+int WriteArrayToFile(line_struct * array, size_t number_of_elements, FILE * answer_file, int puts(const char *, FILE *)) {
+    int result_of_puts_func = 0;
+    for(size_t i = 0; i < number_of_elements; i++) {
+            result_of_puts_func = puts(array[i].str, answer_file);
+            if (result_of_puts_func == EOF ) {
+                perror("error in WriteArrayToFile, cannot write...");
+            }
         }
-        while (j >= 0 && !isalpha((unsigned char)s2[j])) {
-            j--;
-        }
-        if(i < 0 && j < 0) {
-            return 0;
-        }
-        if (i < 0) return 1;
-        if (j < 0) return -1;
-        if (tolower((unsigned char)tolower(s1[i])) != tolower((unsigned char)tolower(s2[j]))) {
-            return  tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
-        }
-        i--;
-        j--;
-    }
-    return tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+    PRINT_LINE
+    return 0;
 }
-
-int CompareLinesByPointers (const void * str1, const void * str2) {
-    return str1 > str2;
-}
-
 
 int main() {
-    char * line = NULL;
-    const size_t number_of_lines = 7000;
-    size_t len = 0;
-    ssize_t read = 0;
-    size_t j = 0;
-    char * * lines = (char * *)calloc(number_of_lines, sizeof(char *));
-    assert(lines);
 
-    FILE * file = fopen("eugene.txt", "r");
-    assert(file);
+    buffer_struct read =    ReadFromFileToBuffer("test_data/eugene.txt");
+    char * text =           read.buffer;
+    size_t nitems =         read.nitems;
 
-    while ((read = getline(&line, &len, file)) != -1) {
-        lines[j] = strdup(line);
-        assert(lines[j]);
-        j++;
+    lines_array_struct formed_array =   FormLinesArray(text, nitems);
+    line_struct * lines_array =         formed_array.lines;
+    size_t lines_count =                formed_array.lines_count;
+
+    FILE * answer_file = fopen("output_file.txt", "w");
+    if (   answer_file == NULL) {
+        perror("error in opening answer file occured, no such file");
     }
-    fclose(file);
-    free(line);
-    qsort(lines, j, sizeof(char *), CompareLinesAscending);
-    assert(lines);
-    FILE * answer_file = fopen("zheka.txt", "w");
-    assert(answer_file);
-    for(size_t i = 0; i < j; i++) {
-        printf("%s", lines[i]);
-        fputs(lines[i], answer_file);
+
+    qsort(            lines_array, lines_count, sizeof(line_struct), CompareLinesAscending);
+    WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
+
+    user_Hoare_qsort( lines_array, lines_count, sizeof(line_struct), CompareLinesDescending);
+    WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
+
+    user_Lamuto_qsort(lines_array, lines_count, sizeof(line_struct), CompareByPosition);
+    WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
+
+    int close_file_result = fclose(answer_file);
+    if (close_file_result != 0) {
+        perror("Cannot close answer file");
+        return 0;
     }
-    fprintf(answer_file, "_______________________________________________\n");
-    qsort(lines, j, sizeof(char *), CompareLinesDescending);
-    assert(lines);
-    for(size_t i = 0; i < j; i++) {
-        printf("%s", lines[i]);
-        fputs(lines[i], answer_file);
-    }
-    puts("finale");
-    // fprintf(answer_file, "_______________________________________________\n");
-    // qsort(lines, j, sizeof(char *), CompareLinesByPointers);
-    // assert(lines);
-    // for(size_t i = 0; i < j; i++) {
-    //     fprintf(answer_file, lines[i]);
-    // }
-    fclose(answer_file);
+
+    free(lines_array);
+    colorPrint("SUCCESS", GRN);
     return EXIT_SUCCESS;
+
 }

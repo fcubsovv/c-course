@@ -4,8 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-//
-
 size_t user_strlen(const char * s) {
     size_t i = 0;
     while (s[i] != '\0') {
@@ -14,6 +12,20 @@ size_t user_strlen(const char * s) {
     return i;
 }
 
+int n_fputs(const char *str, FILE *stream) {
+    while (*str != '\n' && *str != '\0') {
+        if (fputc(*str, stream) == EOF) {
+            return EOF;
+        }
+        str++;
+    }
+    if (*str == '\n') {
+        if (fputc('\n', stream) == EOF) {
+            return EOF;
+        }
+    }
+    return 0;
+}
 size_t user_strnlen(const char *s, size_t maxlen) {
     for (size_t i = 0; i <= maxlen; i++) {
         if (s[i] == '\0') {
@@ -121,7 +133,7 @@ char * user_strndup(const char *s, size_t n) {
     return new_string;
 }
 
-char * user_strrvs(char * s) { //TODO rewrite
+char * user_strrvs(char * s) {
     int size = user_strlen(s);
     for (int i = 0; i < size/2; i++) {
         char temporary = s[i];
