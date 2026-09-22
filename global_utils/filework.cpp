@@ -12,7 +12,7 @@ struct buffer_struct {
     size_t nitems;
 };
 
-buffer_struct ReadFromFileToBuffer(char * file_name) {
+buffer_struct ReadFromFileToBuffer(const char * file_name) {
     buffer_struct answer = {
         NULL,
         NULL
