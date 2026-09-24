@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <ctype.h>
 #include <sys/stat.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -17,42 +16,59 @@ struct line_struct {
     size_t position;
 };
 
-int CompareLinesAscending(const void * str1_struct, const void * str2_struct) {///readability
+size_t skip_junk_symbols_acc(const char * s1, size_t len_1, size_t index) {
+    while (index < len_1 && s1[index] != '\n' && s1[index]!= '\0' && !isalpha((unsigned char)s1[index])) {
+        index++;
+    }
+    return index;
+}
+
+size_t skip_junk_symbols_dec(const char * s1, size_t index) {
+    while (index >= 0 && !isalpha((unsigned char)s1[index])) {
+        index--;
+    }
+    return index;
+}
+
+int CompareLinesAscending(const void * str1_struct, const void * str2_struct) {
+
     if (!str1_struct) {
         perror("error in CompareLinesAscending, no str1_struct");
     }
     if (!str2_struct) {
         perror("error in CompareLinesAscending, no str2_struct");
     }
+
     const char *s1 = ((const line_struct *)str1_struct) -> str;
     const char *s2 = ((const line_struct *)str2_struct) -> str;
     int len_1 = ((line_struct*)str1_struct)->length;
     int len_2 = ((line_struct*)str2_struct)->length;
+
     int i = 0;
     int j = 0;
+    int difference = 0;
     while (1) {
-        while (i < len_1 && s1[i] != '\n' && s1[i]!= '\0' && !isalpha((unsigned char)s1[i])) {
-            i++;
-        }
-        while (j < len_2 && s2[j] != '\n' && s2[j]!='\0'&& !isalpha((unsigned char)s2[j])) {
-            j++;
-        }
-        if ((i >= len_1 || s1[i] == '\0' || s1[i] == '\n') && (j >= len_2 || s2[j] == '\0' || s2[j] == '\n')) {
+        i = skip_junk_symbols_acc(s1, len_1, i);
+        j = skip_junk_symbols_acc(s2, len_2, j);
+        int i_ended = (i >= len_1 || s1[i] == '\0' || s1[i] == '\n') ;
+        int j_ended = (j >= len_2 || s2[j] == '\0' || s2[j] == '\n');
+        if (i_ended && j_ended) {
             return 0;
         }
-        if (s1[i] == '\0' || s1[i] == '\n' || i >= len_1) {
+        if (i_ended) {
             return -1;
         }
-        if (s2[j] == '\0' || s2[j] == '\n' || j >= len_2) {
+        if (j_ended) {
             return 1;
         }
-        if (tolower((unsigned char)s1[i]) != tolower((unsigned char)s2[j])) {
-            return tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+        difference = tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+        if (difference != 0) {
+            return difference;
         }
         i++;
         j++;
     }
-    return tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+    return difference;
 }
 
 int CompareLinesDescending(const void * str1_struct, const void * str2_struct) {
@@ -66,28 +82,32 @@ int CompareLinesDescending(const void * str1_struct, const void * str2_struct) {
     const char *s2 = ((const line_struct *)str2_struct) -> str;
     int i = ((line_struct*)str1_struct)->length - 1;
     int j = ((line_struct*)str2_struct)->length - 1;
+    int difference = 0;
     while (1) {
-        while (i >= 0 && !isalpha((unsigned char)s1[i])) {
-            i--;
-        }
-        while (j >= 0 && !isalpha((unsigned char)s2[j])) {
-            j--;
-        }
-        if(i < 0 && j < 0) {
+
+        i = skip_junk_symbols_dec(s1, i);
+        j = skip_junk_symbols_dec(s2, j);
+
+        int i_ended = i < 0;
+        int j_ended = j < 0;
+
+        if (i_ended && j_ended) {
             return 0;
         }
-        if (i < 0) return  1;
-        if (j < 0) return -1;
-        if (tolower((unsigned char)tolower(s1[i])) != tolower((unsigned char)tolower(s2[j]))) {
-            return  tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+        if (i_ended) return  1;
+        if (j_ended) return -1;
+
+        difference = tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+        if (difference != 0) {
+            return  difference;
         }
         i--;
         j--;
     }
-    return tolower((unsigned char)s1[i]) - tolower((unsigned char)s2[j]);
+    return difference;
 }
 
-int CompareByPosition(const void * str1_struct, const void * str2_struct) {
+int CompareByPosition(const void * str1_struct, const void * str2_struct) {//
     const size_t pos_1 = ((const line_struct *)str1_struct) -> position;
     const size_t pos_2 = ((const line_struct *)str2_struct) -> position;
     if (pos_1 < pos_2) {

@@ -23,44 +23,33 @@ struct lines_array_struct {
 lines_array_struct FormLinesArray(buffer_struct read) {
     char * text =           read.buffer;
     size_t nitems =         read.nitems;
-    size_t lines_count = 0;
-    size_t memory_tracker = 8;
+    size_t j = 0;
+    size_t num_of_strings = 0;
     size_t previous_line_end = 0;
-    /// \n count
-    line_struct * lines_array = (line_struct *)calloc(memory_tracker, sizeof(line_struct));
-
-    lines_array[lines_count].str = &text[0];
-    lines_count++;
-    for (size_t i = 1; i < nitems; i++) {
+    for (int i = 0; i < nitems; i++) {
         if (text[i] == '\n') {
-
-            lines_array[lines_count-1].length = i-previous_line_end;
-
-            if ((i+1) < nitems) {
-
-                if (lines_count >= memory_tracker) {
-
-                    memory_tracker *= 2;
-                    lines_array = (line_struct *)realloc(lines_array, memory_tracker*(sizeof(line_struct)));
-
-                    if (lines_array == NULL) {
-                        perror("Error in memory usage, cannot expand lines_array");
-                        return {};
-                    }
-                }
-
-                lines_array[lines_count].str = &text[i+1];
-                lines_array[lines_count].position = lines_count;
-                lines_count++;
-                previous_line_end = i+1;
-            }
+            num_of_strings++;
         }
     }
-
-    //if file finished not on \n add handling
+    line_struct * lines_array = (line_struct *)calloc(num_of_strings, sizeof(line_struct));
+    lines_array[j].str = &text[0];
+    j++;
+    for (size_t i = 1; i < nitems; i++) {
+        if (text[i] == '\n') {
+            lines_array[j-1].length = i-previous_line_end;
+            if (i+1 < nitems) {
+                lines_array[j].str = &text[i+1];
+                lines_array[j].position = j;
+                j++;
+                previous_line_end = i+1;
+            }
+        } else if (i == nitems) {
+            lines_array[j-1].length = i-previous_line_end + 1;
+        }
+    }
     return {
         lines_array,
-        lines_count
+        j,
     };
 
 }
@@ -77,9 +66,43 @@ int WriteArrayToFile(line_struct * array, size_t number_of_elements, FILE * answ
     return 0;
 }
 
-int main() {
+struct mode_struct {
+    const char * mode_name;
+    int (*comporator)(const void *, const void *);
+};
 
-    buffer_struct read = ReadFromFileToBuffer("test_data/zheka_washed.txt");///NULL check
+const mode_struct modes[] = {
+    {"acc\0", CompareLinesAscending},
+    {"decc\0", CompareLinesDescending},
+    {"straight\0", CompareByPosition}
+};
+
+int RunCommand (const char * mode, line_struct * lines_array, size_t lines_count, FILE * answer_file) {
+    int modecode = -1;
+    size_t arrsize = sizeof(modes)/sizeof(mode_struct);
+    for (size_t i = 0; i < arrsize ; i++) {
+        if (strcmp(mode, modes[i].mode_name) == 0) {
+            modecode = (int)i;
+        }
+    }
+    if (modecode == -1) {
+        return 0;
+    }
+    qsort(            lines_array, lines_count, sizeof(line_struct), modes[modecode].comporator);
+    WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
+    return 1;
+}
+
+int main(const int argc, const char * args[]) {
+
+    const char * file = args[1];
+
+    buffer_struct read = ReadFromFileToBuffer(file);
+    if (read.buffer == NULL || read.nitems == 0) {
+        perror("Nothing to read, ReadFromFile returned nothing");
+        return 0;
+    }
+
     lines_array_struct formed_array =   FormLinesArray(read);
     line_struct * lines_array =         formed_array.lines;
     size_t lines_count =                formed_array.lines_count;
@@ -89,14 +112,13 @@ int main() {
         perror("error in opening answer file occured");
     }
 
-    qsort(            lines_array, lines_count, sizeof(line_struct), CompareLinesAscending);
-    WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
-
-    user_Hoare_qsort( lines_array, lines_count, sizeof(line_struct), CompareLinesDescending);
-    WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
-
-    user_Lamuto_qsort(lines_array, lines_count, sizeof(line_struct), CompareByPosition);
-    WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
+    for (size_t i = 2; i < argc; i++) {
+            int res = RunCommand(args[i], lines_array, lines_count, answer_file);
+            if (res == 0) {
+                perror("No such mode!");
+                return 0;
+        }
+    }
 
     int close_file_result = fclose(answer_file);
     if (close_file_result != 0) {

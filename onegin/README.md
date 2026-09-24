@@ -20,8 +20,18 @@ Navigate to the onegin folder and compile the source files directly:
 ```bash
 cd onegin
 g++ main.cpp main.cpp -o demo
-./demo
 ```
-* For sorting different text change zheka_washed.txt file
+#### Now you can sort various textes from files using flags:
+* First flag - file location
+* All following flags: sort modes: acc decc or straight
+#### Example:
+
+```bash
+./reader test_data/eugene.txt decc acc decc acc straight
+```
+Will write to an output_file.txt decc, acc than decc, acc and than straight version of the text
+
+### Notes
+* Eugene Oneging text is located in zheka_washed.txt file
 * Sort results may be found in file output_file.txt
 
