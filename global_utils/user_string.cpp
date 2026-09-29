@@ -12,7 +12,7 @@ size_t user_strlen(const char * s) {
     return i;
 }
 
-int n_fputs(const char *str, FILE *stream) {
+int n_fputs(const unsigned char *str, FILE *stream) {
     while (*str != '\n' && *str != '\0') {
         if (fputc(*str, stream) == EOF) {
             return EOF;

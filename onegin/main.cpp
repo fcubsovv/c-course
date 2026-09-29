@@ -5,23 +5,21 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+#include "junky_generator.cpp"
+
 #include "comparators.cpp"
 
-#include "../global_utils/user_string.cpp"
 #include "../global_utils/colors.cpp"
 #include "../global_utils/filework.cpp"
-#include "../global_utils/log_utils.cpp"
 
 #include "../sorting/user_qsort.cpp"
 
-
-struct lines_array_struct {
-    line_struct * lines;
-    size_t lines_count;
-};
-
 lines_array_struct FormLinesArray(buffer_struct read) {
-    char * text =           read.buffer;
+    char unsigned * text =           read.buffer;
     size_t nitems =         read.nitems;
     size_t j = 0;
     size_t num_of_strings = 0;
@@ -54,7 +52,7 @@ lines_array_struct FormLinesArray(buffer_struct read) {
 
 }
 
-int WriteArrayToFile(line_struct * array, size_t number_of_elements, FILE * answer_file, int puts(const char *, FILE *)) {
+int WriteArrayToFile(line_struct * array, size_t number_of_elements, FILE * answer_file, int puts(const unsigned char *, FILE *)) {
     int result_of_puts_func = 0;
     for(size_t i = 0; i < number_of_elements; i++) {
             result_of_puts_func = puts(array[i].str, answer_file);
@@ -62,7 +60,7 @@ int WriteArrayToFile(line_struct * array, size_t number_of_elements, FILE * answ
                 perror("error in WriteArrayToFile, cannot write...");
             }
         }
-    PRINT_LINE
+    puts((unsigned char *)"__________________________________________________\n", answer_file);
     return 0;
 }
 
@@ -72,12 +70,13 @@ struct mode_struct {
 };
 
 const mode_struct modes[] = {
-    {"acc\0", CompareLinesAscending},
-    {"decc\0", CompareLinesDescending},
-    {"straight\0", CompareByPosition}
+    {"acc", CompareLinesAscending},
+    {"decc", CompareLinesDescending},
+    {"straight", CompareByPosition},
+    {"rhyme", CompareLastThreeSymbols},
 };
 
-int RunCommand (const char * mode, line_struct * lines_array, size_t lines_count, FILE * answer_file) {
+int RunCommand (const char * mode, line_struct * lines_array, size_t lines_count, FILE * answer_file, const char * lang) {
     int modecode = -1;
     size_t arrsize = sizeof(modes)/sizeof(mode_struct);
     for (size_t i = 0; i < arrsize ; i++) {
@@ -96,6 +95,13 @@ int RunCommand (const char * mode, line_struct * lines_array, size_t lines_count
 int main(const int argc, const char * args[]) {
 
     const char * file = args[1];
+    const char * lang = args[2];
+    size_t start = 2;
+
+    if (strcmp(lang, "--ru") == 0 ){
+        start++;
+        setlocale(LC_CTYPE, "ru_RU.CP1251");
+    }
 
     buffer_struct read = ReadFromFileToBuffer(file);
     if (read.buffer == NULL || read.nitems == 0) {
@@ -112,14 +118,18 @@ int main(const int argc, const char * args[]) {
         perror("error in opening answer file occured");
     }
 
-    for (size_t i = 2; i < argc; i++) {
-            int res = RunCommand(args[i], lines_array, lines_count, answer_file);
+
+
+    line_struct * verse = GenerateSomeJunk(lines_array, lines_count, 2);
+    WriteArrayToFile( verse, lines_count, answer_file, n_fputs);
+
+    for (size_t i = start; i < argc; i++) {
+            int res = RunCommand(args[i], lines_array, lines_count, answer_file, lang);
             if (res == 0) {
                 perror("No such mode!");
                 return 0;
         }
     }
-
     int close_file_result = fclose(answer_file);
     if (close_file_result != 0) {
         perror("Cannot close answer file");

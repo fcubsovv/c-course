@@ -8,7 +8,7 @@
 
 ```text
 ├── test_data/           # test samples
-├── comparators          # basically comp functions
+├── comparators.cpp      # basically comp functions
 ├── main.cpp             # main script
 ├── output_file.txt      # resulting file
 ```
@@ -27,7 +27,7 @@ g++ main.cpp main.cpp -o demo
 #### Example:
 
 ```bash
-./reader test_data/eugene.txt decc acc decc acc straight
+./demo test_data/eugene.txt decc acc decc acc straight
 ```
 Will write to an output_file.txt decc, acc than decc, acc and than straight version of the text
 

@@ -4,11 +4,10 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <errno.h>
 #include <unistd.h>
 
 struct buffer_struct {
-    char * buffer;
+    unsigned char * buffer;
     size_t nitems;
 };
 
@@ -25,7 +24,7 @@ buffer_struct ReadFromFileToBuffer(const char * file_name) {
     struct stat buff;
     fstat(file, &buff);
     size_t nitems = buff.st_size;
-    char * buffer = (char *) calloc(nitems+1, sizeof(char));
+    unsigned char * buffer = (unsigned char *) calloc(nitems+1, sizeof(char));
     if (buffer == NULL) {
         perror("error in memory usage for text");
         return answer;

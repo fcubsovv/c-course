@@ -11,20 +11,31 @@
 
 
 struct line_struct {
-    char * str;
+    unsigned char * str;
     size_t length;
     size_t position;
 };
 
-size_t skip_junk_symbols_acc(const char * s1, size_t len_1, size_t index) {
-    while (index < len_1 && s1[index] != '\n' && s1[index]!= '\0' && !isalpha((unsigned char)s1[index])) {
+
+int isalpha_cp1251(unsigned char c) {
+    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+        return 1;
+    }
+    if ((c >= 0xC0 && c <= 0xFF) || c == 0xA8 || c == 0xB8) {
+        return 1;
+    }
+    return 0;
+}
+
+size_t skip_junk_symbols_acc(const unsigned char * s1, size_t len_1, size_t index) {
+    while (index < len_1 && s1[index] != '\n' && s1[index]!= '\0' && !isalpha_cp1251((unsigned char)s1[index])) {
         index++;
     }
     return index;
 }
 
-size_t skip_junk_symbols_dec(const char * s1, size_t index) {
-    while (index >= 0 && !isalpha((unsigned char)s1[index])) {
+size_t skip_junk_symbols_dec(const unsigned char * s1, ssize_t index) {
+    while (index >= 0 && !isalpha_cp1251(s1[index])) {
         index--;
     }
     return index;
@@ -39,8 +50,8 @@ int CompareLinesAscending(const void * str1_struct, const void * str2_struct) {
         perror("error in CompareLinesAscending, no str2_struct");
     }
 
-    const char *s1 = ((const line_struct *)str1_struct) -> str;
-    const char *s2 = ((const line_struct *)str2_struct) -> str;
+    const unsigned char *s1 = ((const line_struct *)str1_struct) -> str;
+    const unsigned char *s2 = ((const line_struct *)str2_struct) -> str;
     int len_1 = ((line_struct*)str1_struct)->length;
     int len_2 = ((line_struct*)str2_struct)->length;
 
@@ -78,10 +89,10 @@ int CompareLinesDescending(const void * str1_struct, const void * str2_struct) {
     if (!str2_struct) {
         perror("error in CompareLinesDescending, no str2_struct");
     }
-    const char *s1 = ((const line_struct *)str1_struct) -> str;
-    const char *s2 = ((const line_struct *)str2_struct) -> str;
-    int i = ((line_struct*)str1_struct)->length - 1;
-    int j = ((line_struct*)str2_struct)->length - 1;
+    const unsigned char *s1 = ((const line_struct *)str1_struct) -> str;
+    const unsigned char *s2 = ((const line_struct *)str2_struct) -> str;
+    ssize_t i = ((line_struct*)str1_struct)->length - 1;
+    ssize_t j = ((line_struct*)str2_struct)->length - 1;
     int difference = 0;
     while (1) {
 
@@ -105,6 +116,45 @@ int CompareLinesDescending(const void * str1_struct, const void * str2_struct) {
         j--;
     }
     return difference;
+}
+
+int CompareLastThreeSymbols(const void * str1_struct, const void * str2_struct) {
+    if (!str1_struct) {
+        perror("error in CompareLinesDescending, no str1_struct");
+    }
+    if (!str2_struct) {
+        perror("error in CompareLinesDescending, no str2_struct");
+    }
+    const unsigned char *s1 = ((const line_struct *)str1_struct) -> str;
+    const unsigned char *s2 = ((const line_struct *)str2_struct) -> str;
+    ssize_t i = (ssize_t)(((const line_struct*)str1_struct)->length) - 1;
+    ssize_t j = (ssize_t)(((const line_struct*)str2_struct)->length) - 1;
+    int difference = 0;
+    int N = 3;
+    while (N > 0) {
+
+        i = skip_junk_symbols_dec(s1, i);
+        j = skip_junk_symbols_dec(s2, j);
+
+        int i_ended = i < 0;
+        int j_ended = j < 0;
+
+        if (i_ended && j_ended) {
+            return 0;
+        }
+        if (i_ended) return  -1;
+        if (j_ended) return 1;
+
+        difference = tolower(s1[i]) - tolower(s2[j]);
+        if (difference != 0) {
+            return  difference;
+        }
+        i--;
+        j--;
+        N--;
+    }
+    return difference;
+
 }
 
 int CompareByPosition(const void * str1_struct, const void * str2_struct) {//
