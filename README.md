@@ -11,7 +11,8 @@ C course made by DED, based on project-way thinking
 ├── onegin/               # ONEGIN: Optimizing line sorting for huge textes
 │   └── test_data/        # Inner folder with test samples
 ├── sorting               # Self-written sorting functions, include qsort, bubsort, mergesort
-├── stack                 #
+├── stack                 # Self-written _STACK_ lib for using stack data structure. Created for further usage in SPU project
+├── SPU
 ```
 
 ## 🚀 QUICK START
