@@ -1,8 +1,4 @@
-#ifndef CRC32
-#define CRC32
-#include <stdint.h>
-#include <stddef.h>
-
+#include "../h/crc32.h"
 
 uint32_t CalculateCRC32(const void *ptr, size_t size) {
     if (ptr == NULL || size == 0) return 0;
@@ -31,4 +27,4 @@ uint32_t CalculateCRC32(const void *ptr, size_t size) {
 
     return crc ^ 0xFFFFFFFF;
 }
-#endif
+

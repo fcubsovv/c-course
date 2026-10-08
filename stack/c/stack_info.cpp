@@ -1,15 +1,5 @@
-#ifndef STACK_INFO
-#define STACK_INFO
-
-#define GETLINE __LINE__
-#define GETFUNCTION __func__
-#define GETFILE __FILE__
-#define GETNAME(a) #a
-#define VANGUARD 0xDEADC0DEBAADF00DULL
-#define REARGUARD 0xBADCAFE1BADB0015ULL
-#define POISON_VALUE 6666.66666
-#define ARR_VANGUARD 7777.77777
-#include "errors.cpp"
+#include "../h/stack_info.h"
+//-------------------------------------------------------------------------------------------------------------------
 
 ERROR_CODES print_double(void * data_el_ptr) {
     if (data_el_ptr == NULL) {
@@ -35,8 +25,10 @@ ERROR_CODES fprintf_double(void * data_el_ptr, FILE * log) {
     return allright;
 }
 
+//-------------------------------------------------------------------------------------------------------------------
 
-#endif
+
+//-------------------------------------------------------------------------------------------------------------------
 
 
 

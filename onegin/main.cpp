@@ -12,9 +12,9 @@
 #include "junky_generator.cpp"
 
 #include "comparators.cpp"
+#include "../global_utils/filework.cpp"
 
 #include "../global_utils/colors.cpp"
-#include "../global_utils/filework.cpp"
 
 #include "../sorting/user_qsort.cpp"
 
@@ -87,6 +87,12 @@ int RunCommand (const char * mode, line_struct * lines_array, size_t lines_count
     if (modecode == -1) {
         return 0;
     }
+    if (modecode == 3) {
+        size_t generated_count = 1 * 14;
+        line_struct * verse = GenerateSomeJunk(lines_array, lines_count, 1);
+        WriteArrayToFile( verse, generated_count, answer_file, n_fputs);
+        return 1;
+    }
     qsort(            lines_array, lines_count, sizeof(line_struct), modes[modecode].comporator);
     WriteArrayToFile( lines_array, lines_count, answer_file, n_fputs);
     return 1;
@@ -117,11 +123,6 @@ int main(const int argc, const char * args[]) {
     if (   answer_file == NULL) {
         perror("error in opening answer file occured");
     }
-
-
-
-    line_struct * verse = GenerateSomeJunk(lines_array, lines_count, 2);
-    WriteArrayToFile( verse, lines_count, answer_file, n_fputs);
 
     for (size_t i = start; i < argc; i++) {
             int res = RunCommand(args[i], lines_array, lines_count, answer_file, lang);

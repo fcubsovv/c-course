@@ -1,138 +1,78 @@
 ==========ERROR OCCURRED============
+ERROR CODE: 1
+ERROR MESSAGE: null ptr to struct
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 5 line in StackPush() 
+================END=================
+==========ERROR OCCURRED============
+ERROR CODE: 1
+ERROR MESSAGE: null ptr to struct
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 41 line in StackPop() 
+================END=================
+==========ERROR OCCURRED============
+ERROR CODE: 1
+ERROR MESSAGE: null ptr to struct
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 143 line in StackCopy() 
+================END=================
+==========ERROR OCCURRED============
+ERROR CODE: 1
+ERROR MESSAGE: null ptr to struct
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 73 line in StackConstructor() 
+================END=================
+==========ERROR OCCURRED============
+ERROR CODE: 1
+ERROR MESSAGE: null ptr to struct
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 115 line in StackDestructor() 
+================END=================
+==========ERROR OCCURRED============
 ERROR CODE: 4
 ERROR MESSAGE: invalid vanguard
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 91 line in StackConstructor() 
-STACK ENTRAILS: 
----->STACK SIZE: 0 
----->STACK CAPACITY: 0
----->STACK VARIABLE NAME (null)
----->STACK DATA HASH 0x0
----->STACK STRUCT HASH 0x0
----->STACK: 
------->STACK DATA = 
----->VANGUARD: 0x0
----->REARGUARD: 0x0
-STACK WAS CREATED IN : (null) in (null)() in 0 line
-STACK WAS CREATED AT: [1900-01-00 00:00:00] 
-================END=================
-==========ERROR OCCURRED============
-ERROR CODE: 4
-ERROR MESSAGE: invalid vanguard
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 91 line in StackConstructor() 
-STACK ENTRAILS: 
----->STACK SIZE: 0 
----->STACK CAPACITY: 0
----->STACK VARIABLE NAME (null)
----->STACK DATA HASH 0x0
----->STACK STRUCT HASH 0x0
----->STACK: 
------->STACK DATA = 
----->VANGUARD: 0x0
----->REARGUARD: 0x0
-STACK WAS CREATED IN : (null) in (null)() in 0 line
-STACK WAS CREATED AT: [1900-01-00 00:00:00] 
-================END=================
-==========ERROR OCCURRED============
-ERROR CODE: 1
-ERROR MESSAGE: null ptr to struct
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 23 line in StackPush() 
-================END=================
-==========ERROR OCCURRED============
-ERROR CODE: 1
-ERROR MESSAGE: null ptr to struct
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 59 line in StackPop() 
-================END=================
-==========ERROR OCCURRED============
-ERROR CODE: 1
-ERROR MESSAGE: null ptr to struct
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 161 line in CopyStack() 
-================END=================
-==========ERROR OCCURRED============
-ERROR CODE: 1
-ERROR MESSAGE: null ptr to struct
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 91 line in StackConstructor() 
-================END=================
-==========ERROR OCCURRED============
-ERROR CODE: 1
-ERROR MESSAGE: null ptr to struct
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 133 line in StackDestructor() 
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 73 line in StackConstructor() 
 ================END=================
 ==========ERROR OCCURRED============
 ERROR CODE: 2
 ERROR MESSAGE: stack data interruption start
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 23 line in StackPush() 
-STACK ENTRAILS: 
----->STACK SIZE: 4 
----->STACK CAPACITY: 8
----->STACK VARIABLE NAME myFrstStack
----->STACK DATA HASH 0x7938312e
----->STACK STRUCT HASH 0x1208077513
----->STACK: 
------->STACK DATA = 89 2 4 7 6666.67 6666.67 6666.67 
----->VANGUARD: 0xdeadc0dfd7b058cd
----->REARGUARD: 0xbadcafe0d7c6a8d5
-STACK WAS CREATED IN : main.cpp in main() in 104 line
-STACK WAS CREATED AT: [2026-10-06 13:23:19] 
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 5 line in StackPush() 
 ================END=================
 ==========ERROR OCCURRED============
-ERROR CODE: 5
-ERROR MESSAGE: invalid rearguard
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 23 line in StackPush() 
-STACK ENTRAILS: 
----->STACK SIZE: 4 
----->STACK CAPACITY: 8
----->STACK VARIABLE NAME mySecondStack
----->STACK DATA HASH 0x7938312e
----->STACK STRUCT HASH 0x3839350010
----->STACK: 
------->STACK DATA = 89 2 4 7 6666.67 6666.67 6666.67 
----->VANGUARD: 0xdeadc0dfd7b0599d
----->REARGUARD: 0xbadcafe1badb0015
-STACK WAS CREATED IN : main.cpp in main() in 104 line
-STACK WAS CREATED AT: [2026-10-06 13:23:19] 
+ERROR CODE: 3
+ERROR MESSAGE: stack data interruption end
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 5 line in StackPush() 
 ================END=================
 ==========ERROR OCCURRED============
 ERROR CODE: 4
 ERROR MESSAGE: invalid vanguard
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 59 line in StackPop() 
-STACK ENTRAILS: 
----->STACK SIZE: 4 
----->STACK CAPACITY: 8
----->STACK VARIABLE NAME myFrstStack
----->STACK DATA HASH 0x7938312e
----->STACK STRUCT HASH 0x1208077513
----->STACK: 
------->STACK DATA = 89 2 4 7 6666.67 6666.67 6666.67 
----->VANGUARD: 0xdeadc0debaadf00d
----->REARGUARD: 0xbadcafe0d7c6a8d5
-STACK WAS CREATED IN : main.cpp in main() in 104 line
-STACK WAS CREATED AT: [2026-10-06 13:23:19] 
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 73 line in StackConstructor() 
+================END=================
+==========ERROR OCCURRED============
+ERROR CODE: 4
+ERROR MESSAGE: invalid vanguard
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 5 line in StackPush() 
+================END=================
+==========ERROR OCCURRED============
+ERROR CODE: 5
+ERROR MESSAGE: invalid rearguard
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 5 line in StackPush() 
+================END=================
+==========ERROR OCCURRED============
+ERROR CODE: 4
+ERROR MESSAGE: invalid vanguard
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 73 line in StackConstructor() 
 ================END=================
 ==========ERROR OCCURRED============
 ERROR CODE: 21
 ERROR MESSAGE: invalid data hash
-at : [2026-10-06 13:23:19] 
-in : ./stack_utils.cpp in 59 line in StackPop() 
-STACK ENTRAILS: 
----->STACK SIZE: 4 
----->STACK CAPACITY: 8
----->STACK VARIABLE NAME myFrstStack
----->STACK DATA HASH 0x7938312e
----->STACK STRUCT HASH 0x1208077513
----->STACK: 
------->STACK DATA = 67 2 4 7 6666.67 6666.67 6666.67 
----->VANGUARD: 0xdeadc0dfd7b058cd
----->REARGUARD: 0xbadcafe0d7c6a8d5
-STACK WAS CREATED IN : main.cpp in main() in 104 line
-STACK WAS CREATED AT: [2026-10-06 13:23:19] 
+at : [2026-10-06 16:41:39] 
+in : c/_STACK_.cpp in 5 line in StackPush() 
 ================END=================

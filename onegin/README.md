@@ -30,8 +30,9 @@ g++ main.cpp main.cpp -o demo
 ./demo test_data/eugene.txt decc acc decc acc straight
 ```
 Will write to an output_file.txt decc, acc than decc, acc and than straight version of the text
+Command rhyme creates Pushkin-like 14-line strophe from random Onegin lines
 
 ### Notes
 * Eugene Oneging text is located in zheka_washed.txt file
-* Sort results may be found in file output_file.txt
+* All the results may be found in file output_file.txt
 

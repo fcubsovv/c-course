@@ -1,25 +1,7 @@
-#ifndef STACK_UTILS
-#define STACK_UTILS
-#include "errors.cpp"
-#include "stack.cpp"
-#include "stack_info.cpp"
-#include "assert.h"
-#include "crc32.cpp"
+#include "../h/_STACK_.h"
 
 
-#ifdef DEBUG
-    #define STACK_LOG(stack) \
-        if (CheckStack(stack) != allright) StackDump(stack, __FILE__, __LINE__, __func__, CheckStack(stack), fprintf_double)
-#elif defined(LOGGING)
-    #define STACK_LOG(stack) \
-        StackDump(stack, __FILE__, __LINE__, __func__, CheckStack(stack), fprintf_double)
-#else
-    #define STACK_LOG(stack)
-#endif
-
-
-
-ERROR_CODES StackPush(stack * stack, data_type element) {//FIX
+ERROR_CODES StackPush(stack * stack, data_type element) {
     STACK_LOG(stack);
     ERROR_CODES code = CheckStack(stack);
     if (code != allright) {
@@ -55,15 +37,19 @@ ERROR_CODES StackPush(stack * stack, data_type element) {//FIX
 
 
 
-ERROR_CODES StackPop(stack * stack) {
+ERROR_CODES StackPop(stack * stack, data_type * popped_el) {
     STACK_LOG(stack);
     ERROR_CODES code = CheckStack(stack);
     if (code != allright) {
         return code;
     }
+    if (popped_el == NULL) {
+        return null_ptr;
+    }
     if (stack->size == 0) {
         return zero_size;
     }
+    popped_el = &stack->data[stack->size];
     stack->data[stack->size] = POISON_VALUE;
     stack->size-=1;
     if (stack->size < stack->capacity/2) {
@@ -87,7 +73,7 @@ ERROR_CODES StackPop(stack * stack) {
     return allright;
 }
 
-ERROR_CODES StackConstructor (stack * stack, char * varname, char * function_called_constructor, char * file_called_constructor) {//FIX timecheck function
+ERROR_CODES StackConstructor (stack * stack, const char * varname, const char * function_called_constructor, const char * file_called_constructor) {//FIX timecheck function
     STACK_LOG(stack);
     if (stack == NULL) return null_ptr_to_struct;
     stack->capacity = 8;
@@ -102,9 +88,9 @@ ERROR_CODES StackConstructor (stack * stack, char * varname, char * function_cal
     }
     stack->data[0] = ARR_VANGUARD;
     stack->line = GETLINE;
-    stack->created_by_function = function_called_constructor;
-    stack->created_in_file = file_called_constructor;
-    stack->stack_variable = varname;
+    stack->created_by_function = (char*)function_called_constructor;
+    stack->created_in_file = (char*)file_called_constructor;
+    stack->stack_variable = (char*)varname;
 
     uintptr_t struct_canary_start = VANGUARD ^ (uintptr_t)stack;
     uintptr_t struct_canary_end = REARGUARD ^ (uintptr_t)stack;
@@ -115,8 +101,8 @@ ERROR_CODES StackConstructor (stack * stack, char * varname, char * function_cal
     struct tm *timeinfo = localtime(&time_);
     stack->timeinfo = *timeinfo;
 
-    stack->data_hash =  CalculateCRC32(stack->data, sizeof(data_type) * (stack->capacity+2));//xooor
-    stack->struct_hash = CalculateCRC32(stack, offsetof(struct stack, struct_hash));
+    stack->data_hash =  CalculateCRC32(stack->data, sizeof(data_type) * (stack->capacity+2));//
+    stack->struct_hash = CalculateCRC32(stack, offsetof(struct stack, struct_hash));//
 
     STACK_LOG(stack);
     ERROR_CODES code = CheckStack(stack);
@@ -157,7 +143,7 @@ ERROR_CODES StackDestructor(stack * stack) {
     return allright;
 }
 
-ERROR_CODES CopyStack(const stack * original, stack * parody,  char * function_called_copy, char * file_called_copy, char * varname) {
+ERROR_CODES StackCopy(const stack * original, stack * parody, const   char * function_called_copy, const char * file_called_copy, const char * varname) {
     STACK_LOG(original);
     ERROR_CODES code = CheckStack(original);
     if (code != allright) {
@@ -170,16 +156,16 @@ ERROR_CODES CopyStack(const stack * original, stack * parody,  char * function_c
         printf("%lg\n", original->data[i]);
         StackPush(parody, original->data[i]);
     }
-    parody->data_hash =  CalculateCRC32(parody->data, sizeof(data_type) * (parody->capacity+2));//xooor
-    parody->struct_hash = CalculateCRC32(parody, offsetof(struct stack, struct_hash));
+    parody->data_hash =  CalculateCRC32(parody->data, sizeof(data_type) * (parody->capacity+2));//
+    parody->struct_hash = CalculateCRC32(parody, offsetof(struct stack, struct_hash));//
 
     STACK_LOG(parody);
-    ERROR_CODES code_ = CheckStack(parody);
-    if (code_ != allright) {
-        return code_;
+    code = CheckStack(parody);
+    if (code != allright) {
+        return code;
     }
 
     return allright;
 }
 
-#endif
+

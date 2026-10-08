@@ -1,39 +1,11 @@
-#ifndef STACK
-#define STACK
-#include "stack_info.cpp"
-#include <stdio.h>
-#include <inttypes.h>
-typedef double data_type;
-#include "errors.cpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <cstdio>
-#include <cerrno>
-#include <cstring>
-#include "crc32.cpp"
+#include "../h/stack.h"
 
 
-struct stack {
-    uintptr_t vanguard;
-    data_type * data;
-    size_t capacity;
-    size_t size;
-    char * created_by_function;
-    char * created_in_file;
-    char * stack_variable;
-    int line;
-    tm timeinfo;
-    uint32_t data_hash;
-    uint32_t struct_hash;
-    uintptr_t rearguard;
-};
-
-int PrintStack(stack * stack, ERROR_CODES printer(void *)) {
+ERROR_CODES PrintStack(stack * stack, ERROR_CODES printer(void *)) {
     for (size_t i = 0; i < stack->capacity + 2; i++) {
         printer(&stack->data[i]);
     }
-    return 0;
+    return allright;
 }
 
 ERROR_CODES FprintfStack(const stack * stack, FILE * log, ERROR_CODES fprinter(void *, FILE *)) {
@@ -66,7 +38,7 @@ ERROR_CODES FprintfStack(const stack * stack, FILE * log, ERROR_CODES fprinter(v
     return allright;
 }
 
-ERROR_CODES CheckStack(const stack * stack) {
+ERROR_CODES CheckStack(const stack * stack) {///canary death hash death
     if (stack == NULL) {
         return null_ptr_to_struct;
     }
@@ -79,12 +51,6 @@ ERROR_CODES CheckStack(const stack * stack) {
     if(stack->data[0] != ARR_VANGUARD) {
         return stack_data_interruption_start;
     }
-    if (stack->struct_hash !=  CalculateCRC32(stack, offsetof(struct stack, struct_hash))) {
-        return invalid_struct_hash;
-    }
-    if (stack->data_hash !=  CalculateCRC32(stack->data, sizeof(data_type) * (stack->capacity+2))) {
-        return invalid_data_hash;
-    }
     if (stack->capacity == 0) {
         return zero_capacity;
     }
@@ -95,6 +61,12 @@ ERROR_CODES CheckStack(const stack * stack) {
         if (stack->data[i] != POISON_VALUE) {
             return stack_data_interruption_end;
         }
+    }
+    if (stack->struct_hash !=  CalculateCRC32(stack, offsetof(struct stack, struct_hash))) {
+        return invalid_struct_hash;
+    }
+    if (stack->data_hash !=  CalculateCRC32(stack->data, sizeof(data_type) * (stack->capacity+2))) {
+        return invalid_data_hash;
     }
     if(stack->stack_variable == NULL) {
         return no_info_abt_stack_var_name;
@@ -114,7 +86,7 @@ ERROR_CODES CheckStack(const stack * stack) {
     return allright;
 }
 
-ERROR_CODES StackDump(const stack * stack, const char * file, int line, const char * func, ERROR_CODES code, ERROR_CODES fprint_stack_el(void *, FILE *)) {
+ERROR_CODES DumpStack(const stack * stack, const char * file, int line, const char * func, ERROR_CODES code, ERROR_CODES fprint_stack_el(void *, FILE *)) {
     FILE * log = fopen("stack_debug.log", "a");
     if (log == NULL) {
         ErrorDump(cannot_open_file, GETFILE, GETFUNCTION, GETLINE, "Error opening file");
@@ -136,6 +108,15 @@ ERROR_CODES StackDump(const stack * stack, const char * file, int line, const ch
         ErrorDump(cannot_format_time, GETFILE, GETFUNCTION, GETLINE, "Cannot format time info, not enough place in buffer");
         return cannot_format_time;
     }
+    if (code == null_ptr || code == null_ptr_to_struct || code == stack_data_interruption_start || code == stack_data_interruption_end || code == invalid_vanguard || code == invalid_rearguard || code == invalid_struct_hash || code == invalid_data_hash) {
+        fprintf(log, "==========ERROR OCCURRED============\n");
+        fprintf(log, "ERROR CODE: %d\n", code);
+        fprintf(log, "ERROR MESSAGE: %s\n", ERRORS[code].error_message );
+        fprintf(log, "at : [%s] \n", time_str);
+        fprintf(log,"in : %s in %d line in %s() \n", file, line, func);
+        fprintf(log, "================END=================\n");
+        return code;
+    }
     fprintf(log, "==========ERROR OCCURRED============\n");
     fprintf(log, "ERROR CODE: %d\n", code);
     fprintf(log, "ERROR MESSAGE: %s\n", ERRORS[code].error_message );
@@ -150,4 +131,3 @@ ERROR_CODES StackDump(const stack * stack, const char * file, int line, const ch
     return allright;
 }
 
-#endif

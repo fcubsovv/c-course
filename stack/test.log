@@ -1,0 +1,10 @@
+Stack Push result:        null ptr to struct
+Stack Pop result:         null ptr to struct
+Stack Copy result:        null ptr to struct
+Stack Constructor result: null ptr to struct
+Stack Destructor result:  null ptr to struct
+Arr Vanguard test result: stack data interruption start
+Arr Rearguard test result:stack data interruption end
+Vanguard test result:     invalid vanguard
+Rearguard test result:    invalid rearguard
+Data interruption test    invalid data hash

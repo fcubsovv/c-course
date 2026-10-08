@@ -7,10 +7,10 @@
 #include <cerrno>
 #include <cstring>
 
-
-enum  ERROR_CODES{
+enum  ERROR_CODES{//docs
     null_ptr = 0,
     null_ptr_to_struct,
+    // Stack errors
     stack_data_interruption_start,
     stack_data_interruption_end,
     invalid_vanguard,
@@ -23,6 +23,7 @@ enum  ERROR_CODES{
     no_info_abt_creator_function,
     no_info_abt_stack_line,
     invalid_time_data,
+    // OS errors
     cannot_open_file,
     cannot_get_time,
     cannot_get_time_info,
@@ -39,7 +40,8 @@ struct errors {
     const char * error_message;
 };
 
-errors ERRORS[] = {
+
+const errors ERRORS[] = {
     {null_ptr, "null ptr"},
     {null_ptr_to_struct, "null ptr to struct"},
     {stack_data_interruption_start, "stack data interruption start"},
@@ -65,31 +67,9 @@ errors ERRORS[] = {
     {allright, "allright"},
 };
 
-ERROR_CODES ErrorDump(ERROR_CODES error_code, const char * function, const char * file, int line, const char * error_message) {
 
-    fprintf(stderr, "%s: %s\n", error_message, strerror(errno));
-    fprintf(stderr, "in : %s in %d line in %s() \n", file, line, function);
+ERROR_CODES ErrorDump(ERROR_CODES error_code, const char * function, const char * file, int line, const char * error_message);
 
-    FILE * log = fopen("error_logger.log", "a");
-    if (log == NULL) {
-        fprintf(stderr, "Error opening file: %s\n", strerror(errno));
-        fprintf(stderr, "in : %s in %d line in %s() \n", file, line, function);
-        return cannot_open_file;
-    }
 
-    fprintf(log, "==========ERROR OCCURRED============\n");
-    fprintf(log, "ERROR CODE: %d\n", error_code);
-    fprintf(log, "ERROR MESSAGE: %s\n", ERRORS[error_code].error_message );
-    fprintf(log,"in : %s in %d line in %s() \n", file, line, function);
-    fprintf(log, "================END=================\n");
 
-    fclose(log);
-    if(fclose(log) != 0) {
-        fprintf(stderr, "Error closing stack log file%s\n", strerror(errno));
-        fprintf(stderr,"in : %s in %d line in %s() \n", file, line, function);
-        return cannot_close_log_file;
-    }
-
-    return allright;
-}
 #endif
