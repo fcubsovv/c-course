@@ -28,4 +28,6 @@ const cpu_command COMMANDS_CPU[] = {
     //{"XXX",  read_command_cpu,  HandleReadCommandSpu}
 };
 
+;
+
 #endif

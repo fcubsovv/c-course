@@ -1,11 +1,15 @@
 #include "../h/descriptor.h"
 #include <stdio.h>
-//TODO struct for commands
-//TODO commands array
-//TODO from buffer to lines
-//TODO from lines to int commands and to file
-//TODO отрефакторить эту буквально навозную кучу
-//[%31[^]]]
+//DONE struct for commands
+//DONE commands array
+//DONE from lines to int commands and to file
+//TODO отрефакторить эту буквально навозную кучу, a именно
+    //TODO включение битков тоже для простых случаев
+    //TODO раздбить на подфункции
+    //TODO мб отдельная функция для включения битков
+//TODO function for separating buffer to lines in filesdfjkdj lib!
+//TODO function search in array for global utils lib
+//DONE ram [%31[^]]]
 struct label_entrails {
     char labe_name[32];
     int label_address;
@@ -63,7 +67,7 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
     current_idx = 0;
     line_no = 0;
     while (current_idx < buffer.nitems) {
-
+        //TODO sdelat ondelnuy def read_line, вынести мб в отдельную функцию просто разбиение этой срани на строки? и итерирывать по строгам , но вообще есть проблема с этим, а нет какая пробоема у меня первый проход просто формирует массив меток а второй прото его пропускает заебись так и сделаю
         char line[128] = {};
         size_t line_len = 0;
         while (current_idx < buffer.nitems && buffer.buffer[current_idx] != '\n' && line_len < sizeof(line) - 1) {
@@ -79,19 +83,24 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
         if (line_len == 0) {
             continue;
         }
+    //
+
+
         char command[32] = {};
         char args[32] = {};
         int is_label = 0;
         sscanf(line, "%31[^: ]: %n", command, &is_label);
-        if (is_label > 0) {
+        if (is_label > 0) {//if label than pohui on label
             continue;
         }
+
         int res = sscanf(line, "%31s %31s", command, args);
-        if (res <= 0) continue;
+        if (res <= 0) continue;// if nothing pohui next line
 
         int command_number = -1;
         int command_type = 0;
         int intarg = 0;
+
         for (size_t i = 0; i <  sizeof(COMMANDS_CPU) / sizeof(COMMANDS_CPU[0]); i++) {
             if (strcmp(COMMANDS_CPU[i].command_name, command) == 0) {
                 command_number = (int)COMMANDS_CPU[i].command_number;
@@ -107,12 +116,28 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
 
         if (res == 2) {
             int is_label = 0;
+            int is_work_wth_ram = 0;
             char label[32] = {};
+            char inner_arg[32] = {};
             sscanf(args, "%31[^ ] %n", label, &is_label);
+            sscanf(args, "[%31[^]]]", inner_arg, &is_work_wth_ram);
+            if (is_work_wth_ram > 0) {
+                command_type |= (1 << 3);//врубаю третий биток
+                if (sscanf(inner_arg, "%d", &intarg) == 1) {
+                    command_type |= (1 << 1);//включены первый и третий битки
+                }
+                else if (strcmp(inner_arg, "AX") == 0) { command_type |= (1 << 2); intarg = 1; }//включены второй и третий битки
+                else if (strcmp(inner_arg, "BX") == 0) { command_type |= (1 << 2); intarg = 2; }
+                else if (strcmp(inner_arg, "CX") == 0) { command_type |= (1 << 2); intarg = 3; }
+                else if (strcmp(inner_arg, "DX") == 0) { command_type |= (1 << 2); intarg = 4; }
+                fprintf(file, "%d %d %d\n", command_number, command_type, intarg);
+                continue;
+            }
 
             if (sscanf(args, "%d", &intarg) == 1) {
                 command_type = 1;
             }
+
             else if (strcmp(args, "AX") == 0) { command_type = 2; intarg = 1; }
             else if (strcmp(args, "BX") == 0) { command_type = 2; intarg = 2; }
             else if (strcmp(args, "CX") == 0) { command_type = 2; intarg = 3; }

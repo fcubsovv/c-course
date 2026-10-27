@@ -1,18 +1,18 @@
 #include "../h/handlers.h"
-
+//TODO поменять тип в команд ентраилсах на енум
 STATES_CPU HandlePush(CommandEntrails command_entrails, struct cpu * CPU) {
-    if (command_entrails.command_type == 0) {
-        perror("nothing to push");
-        return error_cpu;
-    }
-    if (command_entrails.command_type == 1) {
-        StackPush(&(CPU->MAIN_DATA), (double)command_entrails.arg);
-    }
-    if (command_entrails.command_type == 2) {
-        switch((int)command_entrails.arg) {
+    //TODO рефакторинг этой навозной кучи
+    switch((int)command_entrails.command_type) {
+        case no_argument:
+            perror("nothing to push");
+            return error_cpu;
+        case int_argument:
+            StackPush(&(CPU->MAIN_DATA), (double)command_entrails.arg);
+            break;
+        case reg_argument:
+            switch((int)command_entrails.arg) {
             case 1:
                 StackPush(&CPU->MAIN_DATA, CPU->ax);
-
                 break;
             case 2:
                 StackPush(&CPU->MAIN_DATA, CPU->bx);
@@ -25,16 +25,74 @@ STATES_CPU HandlePush(CommandEntrails command_entrails, struct cpu * CPU) {
                 break;
             default:
                 perror("no such register");
-        }
+            }
+            break;
+        case ram_int_argument://[5]
+            StackPush(&CPU->MAIN_DATA, CPU->RAM[(size_t)command_entrails.arg]);
+            break;
+        case ram_reg_argument://[AX]
+            switch((int)command_entrails.arg) {
+            case 1:
+                StackPush(&CPU->MAIN_DATA, CPU->RAM[(size_t)CPU->ax]);
+                break;
+            case 2:
+                StackPush(&CPU->MAIN_DATA, CPU->RAM[(size_t)CPU->bx]);
+                break;
+            case 3:
+                StackPush(&CPU->MAIN_DATA, CPU->RAM[(size_t)CPU->cx]);
+                break;
+            case 4:
+                StackPush(&CPU->MAIN_DATA, CPU->RAM[(size_t)CPU->dx]);
+                break;
+            default:
+                perror("no such register");
+            }
+            break;
+        default:
+            perror("nothing to push");
+            return error_cpu;
+            break;
     }
+
     return read_command_cpu;
 }
 
-STATES_CPU HandlePop(CommandEntrails command_entails, cpu * CPU) {
-    if (command_entails.command_type == 2) {
+STATES_CPU HandlePop(CommandEntrails command_entrails, cpu * CPU) {
+    double popped_val = 0;
+    switch((int)command_entrails.command_type) {
+            case reg_argument:
+                StackPop(&(CPU->MAIN_DATA), &popped_val);
+                switch((int)command_entrails.arg) {
+                    case 1: CPU->ax = popped_val; break;
+                    case 2: CPU->bx = popped_val; break;
+                    case 3: CPU->cx = popped_val; break;
+                    case 4: CPU->dx = popped_val; break;
+                };
+                break;
+
+            case ram_int_argument://[5]по адресу 5 записываем попнутое значение
+                StackPop(&(CPU->MAIN_DATA), &popped_val);
+                CPU->RAM[(size_t)command_entrails.arg] = popped_val;
+                break;
+            case ram_reg_argument://[AX]по адресу ах записываем попнутое значение в рам
+                StackPop(&(CPU->MAIN_DATA), &popped_val);
+                switch((int)command_entrails.arg) {
+                    case 1: CPU->RAM[(size_t)CPU->ax] = popped_val; break;
+                    case 2: CPU->RAM[(size_t)CPU->bx] = popped_val; break;
+                    case 3: CPU->RAM[(size_t)CPU->cx] = popped_val; break;
+                    case 4: CPU->RAM[(size_t)CPU->dx] = popped_val; break;
+                };
+                break;
+            default:
+                perror("nothing to push");
+                return error_cpu;
+                break;
+        }
+
+    if (command_entrails.command_type == 2) {
         double popped_val = 0;
         StackPop(&(CPU->MAIN_DATA), &popped_val);
-        switch((int)command_entails.arg) {
+        switch((int)command_entrails.arg) {
             case 1: CPU->ax = popped_val; break;
             case 2: CPU->bx = popped_val; break;
             case 3: CPU->cx = popped_val; break;
@@ -110,7 +168,7 @@ STATES_CPU HandleDraw(CommandEntrails command_entrails, cpu * CPU) {
 }
 
 STATES_CPU HandleJump(CommandEntrails command_entrails, cpu * CPU) {
-    if (command_entrails.command_type == 1) {
+        if (command_entrails.command_type == 1) {
             CPU->IP = (int)command_entrails.arg;
         }
         else if (command_entrails.command_type == 2) {
@@ -131,17 +189,7 @@ STATES_CPU HandleJumpIfGreater(CommandEntrails command_entrails, cpu * CPU) {
     double a;//init
     StackPop(&CPU->MAIN_DATA, &a);
     if (a > b) {
-        if (command_entrails.command_type == 1) {
-            CPU->IP = (int)command_entrails.arg;
-        }
-        else if (command_entrails.command_type == 2) {
-        switch((int)command_entrails.arg) {
-            case 1: CPU->IP = CPU->ax; break;
-            case 2: CPU->IP = CPU->bx; break;
-            case 3: CPU->IP = CPU->cx; break;
-            case 4: CPU->IP = CPU->dx; break;
-            }
-        }
+        HandleJump(command_entrails, CPU);
     }
     return read_command_cpu;
 }
@@ -152,17 +200,7 @@ STATES_CPU HandleJumpGreaterOrEqual(CommandEntrails command_entrails, cpu * CPU)
     double a;//init
     StackPop(&CPU->MAIN_DATA, &a);
     if (a >= b) {
-        if (command_entrails.command_type == 1) {
-            CPU->IP = (int)command_entrails.arg;
-        }
-        else if (command_entrails.command_type == 2) {
-        switch((int)command_entrails.arg) {
-            case 1: CPU->IP = CPU->ax; break;
-            case 2: CPU->IP = CPU->bx; break;
-            case 3: CPU->IP = CPU->cx; break;
-            case 4: CPU->IP = CPU->dx; break;
-            }
-        }
+        HandleJump(command_entrails, CPU);
     }
     return read_command_cpu;
 }
@@ -173,17 +211,7 @@ STATES_CPU HandleJumpIfLess(CommandEntrails command_entrails, cpu * CPU) {
     double a;//init
     StackPop(&CPU->MAIN_DATA, &a);
     if (a < b) {
-        if (command_entrails.command_type == 1) {
-            CPU->IP = (int)command_entrails.arg;
-        }
-        else if (command_entrails.command_type == 2) {
-        switch((int)command_entrails.arg) {
-            case 1: CPU->IP = CPU->ax; break;
-            case 2: CPU->IP = CPU->bx; break;
-            case 3: CPU->IP = CPU->cx; break;
-            case 4: CPU->IP = CPU->dx; break;
-            }
-        }
+        HandleJump(command_entrails, CPU);
     }
     return read_command_cpu;
 }
@@ -194,17 +222,7 @@ STATES_CPU HandleJumpIfLessOrEqual(CommandEntrails command_entrails, cpu * CPU) 
     double a;//init
     StackPop(&CPU->MAIN_DATA, &a);
     if (a <= b) {
-        if (command_entrails.command_type == 1) {
-            CPU->IP = (int)command_entrails.arg;
-        }
-        else if (command_entrails.command_type == 2) {
-        switch((int)command_entrails.arg) {
-            case 1: CPU->IP = CPU->ax; break;
-            case 2: CPU->IP = CPU->bx; break;
-            case 3: CPU->IP = CPU->cx; break;
-            case 4: CPU->IP = CPU->dx; break;
-            }
-        }
+        HandleJump(command_entrails, CPU);
     }
     return read_command_cpu;
 }

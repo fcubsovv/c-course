@@ -27,20 +27,18 @@ int Perform(void) {
     const char * p = (char *)read.buffer;
     int num = 0, type = 0, consumed = 0;
     double val = 0;
-    while (code_size < lines &&
-           sscanf(p, "%d %d %lf%n", &num, &type, &val, &consumed) == 3) {
+    while (code_size < lines && sscanf(p, "%d %d %lf%n", &num, &type, &val, &consumed) == 3) {
         code[code_size].command_number = (STATES_CPU)num;
         code[code_size].command_type   = type;
         code[code_size].arg            = val;
         code_size++;
         p += consumed;
     }
-
     cpu CPU = {};
     CPU.IP = 0;
     STACK_CONSTRUCTOR(&CPU.MAIN_DATA);
     STACK_CONSTRUCTOR(&CPU.LABEL_STACK);
-
+    //___________
     STATES_CPU state = read_command_cpu;
     CommandEntrails current = {};
     int result = 0;
@@ -51,7 +49,6 @@ int Perform(void) {
         result = 1;
         break;
     }
-
     if (CPU.IP >= code_size) {
         fprintf(stderr, "IP out of range\n");
         result = 1;
@@ -59,17 +56,16 @@ int Perform(void) {
     }
     current = code[CPU.IP];
     CPU.IP++;
-
     if (current.command_number < run_push_cpu || current.command_number > run_jp_cpu) {
         fprintf(stderr, "unknown command %d\n", (int)current.command_number);
         result = 1;
         break;
     }
     state = COMMANDS_CPU[current.command_number - 1].handler(current, &CPU);
-}
-if (result == 0) puts("performance finished successfully.");
+    }
+    if (result == 0) puts("performance finished successfully.");
 
-free(code);
-free(read.buffer);
-return result;
+    free(code);
+    free(read.buffer);
+    return result;
 }

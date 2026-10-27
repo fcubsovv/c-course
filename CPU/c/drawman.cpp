@@ -13,7 +13,7 @@
 // int Drawman(unsigned char *arr, size_t arr_length) {
 //     int side = (int)sqrt(arr_length);
 //
-//     int pixel_scale = 1; // Попробуйте 30 или 40
+//     int pixel_scale = 1;
 //
 //
 //     int window_width = side * pixel_scale;
