@@ -60,7 +60,7 @@ int Perform(void) {
     current = code[CPU.IP];
     CPU.IP++;
 
-    if (current.command_number < run_push_cpu || current.command_number > run_jle_cpu) {
+    if (current.command_number < run_push_cpu || current.command_number > run_jp_cpu) {
         fprintf(stderr, "unknown command %d\n", (int)current.command_number);
         result = 1;
         break;

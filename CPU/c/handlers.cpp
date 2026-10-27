@@ -81,7 +81,7 @@ STATES_CPU HandleOut(CommandEntrails command_entrails, cpu * CPU) {
 }
 
 STATES_CPU HandleHlt(CommandEntrails command_entrails, cpu * CPU) {
-    //хуй знает что тут писать
+    //хуй знает что тут писать еще тут надо дамп там майбэ
     return run_hlt_cpu;
 }
 STATES_CPU HandleIn(CommandEntrails command_entrails, cpu * CPU) {
@@ -106,6 +106,21 @@ STATES_CPU HandleRet(CommandEntrails command_entrails, cpu * CPU) {
 }
 
 STATES_CPU HandleDraw(CommandEntrails command_entrails, cpu * CPU) {
+    return read_command_cpu;
+}
+
+STATES_CPU HandleJump(CommandEntrails command_entrails, cpu * CPU) {
+    if (command_entrails.command_type == 1) {
+            CPU->IP = (int)command_entrails.arg;
+        }
+        else if (command_entrails.command_type == 2) {
+        switch((int)command_entrails.arg) {
+            case 1: CPU->IP = CPU->ax; break;
+            case 2: CPU->IP = CPU->bx; break;
+            case 3: CPU->IP = CPU->cx; break;
+            case 4: CPU->IP = CPU->dx; break;
+            }
+        }
     return read_command_cpu;
 }
 

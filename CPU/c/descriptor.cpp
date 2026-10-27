@@ -4,9 +4,18 @@
 //TODO commands array
 //TODO from buffer to lines
 //TODO from lines to int commands and to file
-//TODO
+//TODO отрефакторить эту буквально навозную кучу
+//[%31[^]]]
+struct label_entrails {
+    char labe_name[32];
+    int label_address;
+};
 
 int ReadLinesFromBuffer(buffer_struct buffer) {
+    int command_count = 0;
+    //первый проход
+    label_entrails * label_arr = (label_entrails*)calloc(32, sizeof(label_entrails));
+    size_t label_arr_ptr = 0;
     FILE * file = fopen(decrypted_file, "w"); //
     if (!file) {
         perror("error opening file");
@@ -16,12 +25,48 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
     int line_no = 0;
     size_t current_idx = 0;
     while (current_idx < buffer.nitems) {
+
         char line[128] = {};
         size_t line_len = 0;
-        while (current_idx < buffer.nitems &&
-               buffer.buffer[current_idx] != '\n' &&
-               line_len < sizeof(line) - 1) {
+        while (current_idx < buffer.nitems && buffer.buffer[current_idx] != '\n' && line_len < sizeof(line) - 1) {
+            line[line_len] = (char)buffer.buffer[current_idx];
+            line_len++;
+            current_idx++;
+        }
+        if (current_idx < buffer.nitems && buffer.buffer[current_idx] == '\n') {
+            current_idx++;
+        }
+        line[line_len] = '\0';
+        line_no++;
+        if (line_len == 0) {
+            continue;
+        }
 
+        char command[32] = {};
+        char args[32] = {};
+        int is_label = 0;
+        char label[32] = {};
+        if(sscanf(line, "%31s", command) <= 0) {
+            continue;
+        }
+        sscanf(line, "%31[^: ]: %n", label, &is_label);
+        if (is_label > 0) {
+            // add rashirenie massiva labels using realloc! ili pohui
+            label_arr[label_arr_ptr].label_address = command_count;
+            strcpy(label_arr[label_arr_ptr].labe_name, label);
+            label_arr_ptr++;
+            continue;
+        }
+        command_count++;
+    }
+    //второй проход
+    current_idx = 0;
+    line_no = 0;
+    while (current_idx < buffer.nitems) {
+
+        char line[128] = {};
+        size_t line_len = 0;
+        while (current_idx < buffer.nitems && buffer.buffer[current_idx] != '\n' && line_len < sizeof(line) - 1) {
             line[line_len] = (char)buffer.buffer[current_idx];
             line_len++;
             current_idx++;
@@ -36,14 +81,18 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
         }
         char command[32] = {};
         char args[32] = {};
-
+        int is_label = 0;
+        sscanf(line, "%31[^: ]: %n", command, &is_label);
+        if (is_label > 0) {
+            continue;
+        }
         int res = sscanf(line, "%31s %31s", command, args);
         if (res <= 0) continue;
 
         int command_number = -1;
         int command_type = 0;
         int intarg = 0;
-        for (size_t i = 0; i < sizeof(COMMANDS_CPU) / sizeof(COMMANDS_CPU[0]); i++) {
+        for (size_t i = 0; i <  sizeof(COMMANDS_CPU) / sizeof(COMMANDS_CPU[0]); i++) {
             if (strcmp(COMMANDS_CPU[i].command_name, command) == 0) {
                 command_number = (int)COMMANDS_CPU[i].command_number;
                 break;
@@ -57,6 +106,10 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
         }
 
         if (res == 2) {
+            int is_label = 0;
+            char label[32] = {};
+            sscanf(args, "%31[^ ] %n", label, &is_label);
+
             if (sscanf(args, "%d", &intarg) == 1) {
                 command_type = 1;
             }
@@ -64,6 +117,15 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
             else if (strcmp(args, "BX") == 0) { command_type = 2; intarg = 2; }
             else if (strcmp(args, "CX") == 0) { command_type = 2; intarg = 3; }
             else if (strcmp(args, "DX") == 0) { command_type = 2; intarg = 4; }
+
+            else if(is_label > 0) {
+                for (size_t i = 0; i < label_arr_ptr; i++) {
+                    if(strcmp(label_arr[i].labe_name, label) == 0) {
+                        intarg = label_arr[i].label_address;
+                        command_type = 1;
+                    }
+                }
+            }
             else {
                 printf("error unknown argument in line %d", line_no);
                 result = -1;
@@ -80,6 +142,7 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
     return result;
 }
 
+
 int Descript(void) {
     buffer_struct read = ReadFromFileToBuffer(crypted_file);
     if (read.buffer == NULL || read.nitems == 0) {
@@ -95,3 +158,5 @@ int Descript(void) {
     puts("description finished successfully.");
     return 0;
 }
+
+

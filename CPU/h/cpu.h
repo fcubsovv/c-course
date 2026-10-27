@@ -28,7 +28,7 @@ enum STATES_CPU {
     run_out_cpu     =5,//+
     run_hlt_cpu     =6,//+
     run_in_cpu      =7,//+
-    run_call_cpu    =8,//дописочка
+    run_call_cpu    =8,//додристочка+
     run_ret_cpu     =9,//+
     run_pop_cpu     =10,//+
     run_draw_cpu    =11,//
@@ -36,6 +36,7 @@ enum STATES_CPU {
     run_jge_cpu     =13,//+
     run_jl_cpu      =14,//+
     run_jle_cpu     =15,//+
+    run_jp_cpu      =16,//+
     error_cpu       =-1,
 };
 

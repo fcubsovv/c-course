@@ -29,7 +29,7 @@ STATES_CPU HandleJumpIfGreater      (CommandEntrails command_entrails, cpu * CPU
 STATES_CPU HandleJumpGreaterOrEqual (CommandEntrails command_entrails, cpu * CPU);
 STATES_CPU HandleJumpIfLess         (CommandEntrails command_entrails, cpu * CPU);
 STATES_CPU HandleJumpIfLessOrEqual  (CommandEntrails command_entrails, cpu * CPU);
-
+STATES_CPU HandleJump               (CommandEntrails command_entrails, cpu * CPU);
 
 
 #endif
