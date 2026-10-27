@@ -24,6 +24,7 @@ const cpu_command COMMANDS_CPU[] = {
     {"JGE",  run_jge_cpu,       HandleJumpGreaterOrEqual},
     {"JL",   run_jl_cpu,        HandleJumpIfLess},
     {"JLE",  run_jle_cpu,       HandleJumpIfLessOrEqual},
+    {"PR",   run_pr_ram_cpu,    HandlePrintRam},
     {"JP",   run_jp_cpu,        HandleJump},
     //{"XXX",  read_command_cpu,  HandleReadCommandSpu}
 };

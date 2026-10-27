@@ -108,6 +108,7 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
             }
         }
 
+
         if (command_number == -1) {
             printf("line %d: unavaiable command'%s'\n",  line_no, command);
             result = -1;
@@ -120,16 +121,17 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
             char label[32] = {};
             char inner_arg[32] = {};
             sscanf(args, "%31[^ ] %n", label, &is_label);
-            sscanf(args, "[%31[^]]]", inner_arg, &is_work_wth_ram);
+            sscanf(args, "[%31[^]]] %n", inner_arg, &is_work_wth_ram);
             if (is_work_wth_ram > 0) {
-                command_type |= (1 << 3);//врубаю третий биток
+                command_type |= (1 << 2);//врубаю третий биток
                 if (sscanf(inner_arg, "%d", &intarg) == 1) {
-                    command_type |= (1 << 1);//включены первый и третий битки
+                    command_type |= (1 << 0);//включены первый и третий битки
                 }
-                else if (strcmp(inner_arg, "AX") == 0) { command_type |= (1 << 2); intarg = 1; }//включены второй и третий битки
-                else if (strcmp(inner_arg, "BX") == 0) { command_type |= (1 << 2); intarg = 2; }
-                else if (strcmp(inner_arg, "CX") == 0) { command_type |= (1 << 2); intarg = 3; }
-                else if (strcmp(inner_arg, "DX") == 0) { command_type |= (1 << 2); intarg = 4; }
+                else if (strcmp(inner_arg, "AX") == 0) { command_type |= (1 << 1); intarg = 1; }//включены второй и третий битки
+                else if (strcmp(inner_arg, "BX") == 0) { command_type |= (1 << 1); intarg = 2; }
+                else if (strcmp(inner_arg, "CX") == 0) { command_type |= (1 << 1); intarg = 3; }
+                else if (strcmp(inner_arg, "DX") == 0) { command_type |= (1 << 1); intarg = 4; }
+
                 fprintf(file, "%d %d %d\n", command_number, command_type, intarg);
                 continue;
             }

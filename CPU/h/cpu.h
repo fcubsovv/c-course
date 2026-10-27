@@ -36,7 +36,8 @@ enum STATES_CPU {
     run_jge_cpu     =13,//+
     run_jl_cpu      =14,//+
     run_jle_cpu     =15,//+
-    run_jp_cpu      =16,//+
+    run_pr_ram_cpu  =16,//+
+    run_jp_cpu      =17,//+
     error_cpu       =-1,
 };
 

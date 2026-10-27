@@ -4,6 +4,8 @@ STATES_CPU HandlePush(CommandEntrails command_entrails, struct cpu * CPU) {
     //TODO рефакторинг этой навозной кучи
     switch((int)command_entrails.command_type) {
         case no_argument:
+            printf("command type %d\n", command_entrails.command_type);
+            printf("command arg %lg", command_entrails.arg);
             perror("nothing to push");
             return error_cpu;
         case int_argument:
@@ -72,7 +74,7 @@ STATES_CPU HandlePop(CommandEntrails command_entrails, cpu * CPU) {
 
             case ram_int_argument://[5]по адресу 5 записываем попнутое значение
                 StackPop(&(CPU->MAIN_DATA), &popped_val);
-                CPU->RAM[(size_t)command_entrails.arg] = popped_val;
+               (CPU->RAM)[(size_t)command_entrails.arg] = popped_val;
                 break;
             case ram_reg_argument://[AX]по адресу ах записываем попнутое значение в рам
                 StackPop(&(CPU->MAIN_DATA), &popped_val);
@@ -88,19 +90,6 @@ STATES_CPU HandlePop(CommandEntrails command_entrails, cpu * CPU) {
                 return error_cpu;
                 break;
         }
-
-    if (command_entrails.command_type == 2) {
-        double popped_val = 0;
-        StackPop(&(CPU->MAIN_DATA), &popped_val);
-        switch((int)command_entrails.arg) {
-            case 1: CPU->ax = popped_val; break;
-            case 2: CPU->bx = popped_val; break;
-            case 3: CPU->cx = popped_val; break;
-            case 4: CPU->dx = popped_val; break;
-        }
-    } else {
-        return error_cpu;
-    }
     return read_command_cpu;
 }
 
@@ -121,6 +110,7 @@ STATES_CPU HandleSub(CommandEntrails command_entrails, cpu * CPU) {
     StackPush(&CPU->MAIN_DATA, a - b);
     return read_command_cpu;
 }
+
 STATES_CPU HandleDiv(CommandEntrails command_entrails, cpu * CPU) {
     double b;//init
     StackPop(&CPU->MAIN_DATA, &b);
@@ -142,6 +132,7 @@ STATES_CPU HandleHlt(CommandEntrails command_entrails, cpu * CPU) {
     //хуй знает что тут писать еще тут надо дамп там майбэ
     return run_hlt_cpu;
 }
+
 STATES_CPU HandleIn(CommandEntrails command_entrails, cpu * CPU) {
     double love_me_suck_me = 0;
     puts("insert double");
@@ -227,13 +218,12 @@ STATES_CPU HandleJumpIfLessOrEqual(CommandEntrails command_entrails, cpu * CPU) 
     return read_command_cpu;
 }
 
-//
-//
-// HandlerOutput HandleReadCommandSpu(CommandEntrails command_entrails, cpu * CPU) {
-//     if  (CPU.IP > instructions_size) {
-//         return run_hlt_cpu;
-//     }
-//     CommandEntrails current = code[CPU.IP];
-//     CPU.IP++;
-//     return {current, current.command_number};
-// }
+
+STATES_CPU HandlePrintRam(CommandEntrails command_entrails, cpu * CPU) {//TODO проверки и остальные какашки
+    for (size_t i = 0; i < sizeof(CPU->RAM)/sizeof(double); i++) {
+        printf("%lg ", CPU->RAM[i]);
+    }
+    printf("\n");
+    return read_command_cpu;
+}
+
