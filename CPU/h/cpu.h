@@ -16,7 +16,7 @@ struct cpu {
     size_t IP;
     size_t instructions_size;
 //ram = [-,-,-,-,-] len==100
-    double RAM[100];//полный квадрат это не эстетика я хочу 2х на 3х так что должно делиться на 6
+    double RAM[2500];//полный квадрат это не эстетика я хочу 2х на 3х так что должно делиться на 6
 };
 
 enum STATES_CPU {
@@ -37,7 +37,9 @@ enum STATES_CPU {
     run_jl_cpu      =14,//+
     run_jle_cpu     =15,//+
     run_pr_ram_cpu  =16,//+
-    run_jp_cpu      =17,//+
+    run_mul_cpu     =17,//
+    run_sqrt_cpu    =18,//
+    run_jp_cpu      =19,//+
     error_cpu       =-1,
 };
 

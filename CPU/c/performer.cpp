@@ -63,6 +63,7 @@ int Perform(void) {
     }
     state = COMMANDS_CPU[current.command_number - 1].handler(current, &CPU);
     }
+
     if (result == 0) puts("performance finished successfully.");
 
     free(code);

@@ -31,6 +31,7 @@ STATES_CPU HandleJumpIfLess         (CommandEntrails command_entrails, cpu * CPU
 STATES_CPU HandleJumpIfLessOrEqual  (CommandEntrails command_entrails, cpu * CPU);
 STATES_CPU HandleJump               (CommandEntrails command_entrails, cpu * CPU);
 STATES_CPU HandlePrintRam           (CommandEntrails command_entrails, cpu * CPU);
-
+STATES_CPU HandleMul                (CommandEntrails command_entrails, cpu * CPU);
+STATES_CPU HandleSqrt               (CommandEntrails command_entrails, cpu * CPU);
 
 #endif

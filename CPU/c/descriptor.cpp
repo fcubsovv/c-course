@@ -10,10 +10,14 @@
 //TODO function for separating buffer to lines in filesdfjkdj lib!
 //TODO function search in array for global utils lib
 //DONE ram [%31[^]]]
+//TODO сортировка между проходами
+
+
 struct label_entrails {
     char labe_name[32];
     int label_address;
 };
+
 
 int ReadLinesFromBuffer(buffer_struct buffer) {
     int command_count = 0;
@@ -124,7 +128,7 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
             sscanf(args, "[%31[^]]] %n", inner_arg, &is_work_wth_ram);
             if (is_work_wth_ram > 0) {
                 command_type |= (1 << 2);//врубаю третий биток
-                if (sscanf(inner_arg, "%d", &intarg) == 1) {
+                if (sscanf(inner_arg, "%lf", &intarg) == 1) {
                     command_type |= (1 << 0);//включены первый и третий битки
                 }
                 else if (strcmp(inner_arg, "AX") == 0) { command_type |= (1 << 1); intarg = 1; }//включены второй и третий битки
@@ -136,7 +140,7 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
                 continue;
             }
 
-            if (sscanf(args, "%d", &intarg) == 1) {
+            if (sscanf(args, "%lf", &intarg) == 1) {
                 command_type = 1;
             }
 

@@ -8,8 +8,6 @@
 #include "helpers.h"
 #include "../../global_utils/h/filework.h"
 
-
-
 int Perform(void);
 
 #endif
