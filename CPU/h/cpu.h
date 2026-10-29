@@ -37,18 +37,20 @@ enum STATES_CPU {
     run_jl_cpu      =14,//+
     run_jle_cpu     =15,//+
     run_pr_ram_cpu  =16,//+
-    run_mul_cpu     =17,//
-    run_sqrt_cpu    =18,//
-    run_jp_cpu      =19,//+
+    run_mul_cpu     =17,//+
+    run_sqrt_cpu    =18,//+
+    run_je_cpu      =19,//+
+    run_jne_cpu     =20,//+
+    run_jp_cpu      =21,//+
     error_cpu       =-1,
 };
 
 enum argument_types {
-    no_argument     = 0b000,//0000
-    int_argument    = 0b001,//0001
-    reg_argument    = 0b100,//0010
-    ram_int_argument= 0b101,
-    ram_reg_argument= 0b110,
+    no_argument     = 0,//0000
+    int_argument    = 1,//0001
+    reg_argument    = 2,//0010
+    ram_int_argument= 5,
+    ram_reg_argument= 6,
 };
 
 #endif

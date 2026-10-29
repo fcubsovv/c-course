@@ -2,11 +2,14 @@
 #include "../h/raylib.h"
 #include <stdlib.h>
 #include <math.h>
-//TODO поменять тип в команд ентраилсах на енум
+#define LAST_8_BITS 0xFFu
+
 STATES_CPU HandlePush(CommandEntrails command_entrails, struct cpu * CPU) {
-    //TODO рефакторинг этой навозной кучи
+
     switch((int)command_entrails.command_type) {
+
         case no_argument:
+            printf("command type %d\n", (int)command_entrails.command_type);
             printf("command type %d\n", command_entrails.command_type);
             printf("command arg %lg", command_entrails.arg);
             perror("nothing to push");
@@ -56,11 +59,11 @@ STATES_CPU HandlePop(CommandEntrails command_entrails, cpu * CPU) {
                     case 4: CPU->dx = popped_val; break;
                 };
                 break;
-            case ram_int_argument://[5]по адресу 5 записываем попнутое значение
+            case ram_int_argument:
                 StackPop(&(CPU->MAIN_DATA), &popped_val);
                 (CPU->RAM)[(size_t)command_entrails.arg] = popped_val;
                 break;
-            case ram_reg_argument://[AX]по адресу ах записываем попнутое значение в рам
+            case ram_reg_argument:
                 StackPop(&(CPU->MAIN_DATA), &popped_val);
                 switch((int)command_entrails.arg) {
                     case 1: CPU->RAM[(size_t)CPU->ax] = popped_val; break;
@@ -77,51 +80,49 @@ STATES_CPU HandlePop(CommandEntrails command_entrails, cpu * CPU) {
     return read_command_cpu;
 }
 
+int pop_b_and_a (cpu * CPU, double * a, double * b) {
+    StackPop(&CPU->MAIN_DATA, b);
+    StackPop(&CPU->MAIN_DATA, a);
+    return 1;
+}
+
 STATES_CPU HandleAdd(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a;//init
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     StackPush(&CPU->MAIN_DATA, a + b);
     return read_command_cpu;
 }
 
 STATES_CPU HandleSub(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init b a , a - b
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a;//init
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     StackPush(&CPU->MAIN_DATA, a - b);
     return read_command_cpu;
 }
 
 STATES_CPU HandleDiv(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a;//init
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     StackPush(&CPU->MAIN_DATA, a / b);
     return read_command_cpu;
 }
 
 STATES_CPU HandleOut(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init
-    StackPop(&CPU->MAIN_DATA, &b);
-    StackPush(&CPU->MAIN_DATA, b);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     printf("ELEMENT: %lg\n", b);
     return read_command_cpu;
 }
 
 STATES_CPU HandleHlt(CommandEntrails command_entrails, cpu * CPU) {
-    //хуй знает что тут писать еще тут надо дамп там майбэ
     return run_hlt_cpu;
 }
 
 STATES_CPU HandleIn(CommandEntrails command_entrails, cpu * CPU) {
-    double love_me_suck_me = 0;
-    puts("insert double");
-    scanf("%lg", &love_me_suck_me);
-    StackPush(&CPU->MAIN_DATA, love_me_suck_me);
+    double a = 0;
+    puts("insert element");
+    scanf("%lg", &a);
+    StackPush(&CPU->MAIN_DATA, a);
     return read_command_cpu;
 }
 
@@ -138,15 +139,14 @@ STATES_CPU HandleRet(CommandEntrails command_entrails, cpu * CPU) {
     return read_command_cpu;
 }
 
-#define LAST_8_BITS 0xFFu//всего используем 32 бита  8R,8G,8B,8A
-
-Color GetPixelColor(uint64_t pixel) {//в дубле 64 бита
-        Color pixel_color = {
+Color GetPixelColor(uint64_t pixel) {
+    Color pixel_color = {
         (uint8_t)((((uint32_t)pixel) >> 24) & LAST_8_BITS),
         (uint8_t)((((uint32_t)pixel) >> 16) & LAST_8_BITS),
         (uint8_t)((((uint32_t)pixel) >> 8) & LAST_8_BITS),
-        (uint8_t)(((uint32_t)pixel) & LAST_8_BITS)};
-        return pixel_color;
+        (uint8_t)(((uint32_t)pixel) & LAST_8_BITS)
+    };
+    return pixel_color;
 }
 
 STATES_CPU HandleDraw(CommandEntrails command_entrails, cpu * CPU) {
@@ -197,7 +197,7 @@ STATES_CPU HandleJump(CommandEntrails command_entrails, cpu * CPU) {
                 case 4: CPU->IP = CPU->dx; break;
             }
             break;
-        case ram_int_argument://JUMP [5]
+        case ram_int_argument:
             CPU->IP = (CPU->RAM)[(size_t)command_entrails.arg];
             break;
         case ram_reg_argument:
@@ -217,10 +217,8 @@ STATES_CPU HandleJump(CommandEntrails command_entrails, cpu * CPU) {
 }
 
 STATES_CPU HandleJumpIfGreater(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a;//init
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     if (a > b) {
         HandleJump(command_entrails, CPU);
     }
@@ -228,10 +226,8 @@ STATES_CPU HandleJumpIfGreater(CommandEntrails command_entrails, cpu * CPU) {
 }
 
 STATES_CPU HandleJumpGreaterOrEqual(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a;//init
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     if (a >= b) {
         HandleJump(command_entrails, CPU);
     }
@@ -239,10 +235,8 @@ STATES_CPU HandleJumpGreaterOrEqual(CommandEntrails command_entrails, cpu * CPU)
 }
 
 STATES_CPU HandleJumpIfLess(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a;//init
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     if (a < b) {
         HandleJump(command_entrails, CPU);
     }
@@ -250,11 +244,27 @@ STATES_CPU HandleJumpIfLess(CommandEntrails command_entrails, cpu * CPU) {
 }
 
 STATES_CPU HandleJumpIfLessOrEqual(CommandEntrails command_entrails, cpu * CPU) {
-    double b;//init
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a;//init
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     if (a <= b) {
+        HandleJump(command_entrails, CPU);
+    }
+    return read_command_cpu;
+}
+
+STATES_CPU HandleJumpIfEqual (CommandEntrails command_entrails, cpu * CPU) {
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
+    if (a == b) {
+        HandleJump(command_entrails, CPU);
+    }
+    return read_command_cpu;
+}
+
+STATES_CPU HandleJumpIfNotEqual (CommandEntrails command_entrails, cpu * CPU)  {
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
+    if (a != b) {
         HandleJump(command_entrails, CPU);
     }
     return read_command_cpu;
@@ -270,10 +280,8 @@ STATES_CPU HandlePrintRam(CommandEntrails command_entrails, cpu * CPU) {//TODO �
 
 
 STATES_CPU HandleMul(CommandEntrails command_entrails, cpu * CPU) {
-    double b = NAN;
-    StackPop(&CPU->MAIN_DATA, &b);
-    double a = NAN;
-    StackPop(&CPU->MAIN_DATA, &a);
+    double b = NAN, a = NAN;
+    pop_b_and_a(CPU, &a, &b);
     StackPush(&CPU->MAIN_DATA, a*b);
     return read_command_cpu;
 }

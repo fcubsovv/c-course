@@ -1,9 +1,8 @@
 #include "../h/performer.h"
-//struct CommandArgs;
 
 //bitfield
 //кодировка в окумментации арма для кодировки команд что куда типо получается что надо команы кодирвать по номеру или как это работает
-//26 ти биткое число
+
 const char * execute_file = "test-data/execute.txt";
 
 
@@ -22,7 +21,6 @@ int Perform(void) {
         return 1;
     }
 
-    // парсинг из буфера
     size_t code_size = 0;
     const char * p = (char *)read.buffer;
     int num = 0, type = 0, consumed = 0;

@@ -1,16 +1,6 @@
 #include "../h/descriptor.h"
 #include <stdio.h>
-//DONE struct for commands
-//DONE commands array
-//DONE from lines to int commands and to file
-//TODO отрефакторить эту буквально навозную кучу, a именно
-    //TODO включение битков тоже для простых случаев
-    //TODO раздбить на подфункции
-    //TODO мб отдельная функция для включения битков
-//TODO function for separating buffer to lines in filesdfjkdj lib!
-//TODO function search in array for global utils lib
-//DONE ram [%31[^]]]
-//TODO сортировка между проходами
+
 
 struct label_entrails {
     char labe_name[32];

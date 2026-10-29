@@ -27,6 +27,8 @@ const cpu_command COMMANDS_CPU[] = {
     {"PR",   run_pr_ram_cpu,    HandlePrintRam},
     {"MUL",  run_mul_cpu,       HandleMul},
     {"SQRT", run_sqrt_cpu,      HandleSqrt},
+    {"JE",   run_je_cpu,        HandleJumpIfEqual},
+    {"JNE",  run_jne_cpu,       HandleJumpIfNotEqual},
     {"JP",   run_jp_cpu,        HandleJump},
     //{"XXX",  read_command_cpu,  HandleReadCommandSpu}
 };
