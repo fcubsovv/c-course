@@ -9,8 +9,6 @@
 const char * const crypted_file   = "test-data/commands.txt";
 const char * const decrypted_file = "test-data/execute.txt";
 
-int ReadLinesFromBuffer(buffer_struct buffer);
-
 int Descript(void) ;
 
 

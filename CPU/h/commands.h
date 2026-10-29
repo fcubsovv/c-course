@@ -31,6 +31,6 @@ const cpu_command COMMANDS_CPU[] = {
     //{"XXX",  read_command_cpu,  HandleReadCommandSpu}
 };
 
-;
+int find_command_in_commands(char * command_name);
 
 #endif

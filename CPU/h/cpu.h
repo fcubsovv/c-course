@@ -44,11 +44,11 @@ enum STATES_CPU {
 };
 
 enum argument_types {
-    no_argument     = 0,//0000
-    int_argument    = 1,//0001
-    reg_argument    = 2,//0010
-    ram_int_argument= 5,//0101
-    ram_reg_argument= 6,//0110
+    no_argument     = 0b000,//0000
+    int_argument    = 0b001,//0001
+    reg_argument    = 0b100,//0010
+    ram_int_argument= 0b101,
+    ram_reg_argument= 0b110,
 };
 
 #endif

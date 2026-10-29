@@ -11,7 +11,7 @@
 struct CommandEntrails{
     STATES_CPU command_number;
     int command_type;
-    double arg;
+    long long arg;
 };
 
 STATES_CPU HandlePush               (CommandEntrails command_entrails, cpu * CPU);

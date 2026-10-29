@@ -9,3 +9,4 @@ size_t count_lines_helper(buffer_struct read) {//DONE in helpers folder
     }
     return lines;
 }
+
