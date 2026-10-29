@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
+
 #include "commands.h"
 #include "../../global_utils/h/filework.h"
 

@@ -1,5 +1,5 @@
 #include "../h/commands.h"
-
+// SEE ../h/commands.h
 
 int find_command_in_commands(char * command_name) {
     int command_number = -1;

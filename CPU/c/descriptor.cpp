@@ -1,5 +1,4 @@
 #include "../h/descriptor.h"
-#include <stdio.h>
 
 
 struct label_entrails {
@@ -7,8 +6,15 @@ struct label_entrails {
     int label_address;
 };
 
+static int get_command_line (size_t * current_idx, buffer_struct buffer, char * line, size_t line_size, size_t * line_len);
+static int find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, char * label_name, long long * intarg, int * command_type) ;
 
-int get_command_line (size_t * current_idx, buffer_struct buffer, char * line, size_t line_size, size_t * line_len) {
+static int HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no);
+static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails * label_arr, size_t * label_arr_ptr);
+
+//_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+static int get_command_line (size_t * current_idx, buffer_struct buffer, char * line, size_t line_size, size_t * line_len) {
     while (*current_idx < buffer.nitems && buffer.buffer[*current_idx] != '\n' && *line_len < line_size - 1) {
         line[*line_len] = (char)buffer.buffer[*current_idx];
         (*line_len)++;
@@ -21,7 +27,7 @@ int get_command_line (size_t * current_idx, buffer_struct buffer, char * line, s
     return 0;
 }
 
-int find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, char * label_name, long long * intarg, int * command_type)  {
+static int find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, char * label_name, long long * intarg, int * command_type)  {
     for (size_t i = 0; i < label_arr_size; i++) {
         if(strcmp(label_arr[i].labe_name, label_name) == 0) {
             (*intarg) = label_arr[i].label_address;
@@ -32,7 +38,7 @@ int find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, 
     return -1;
 }
 
-int HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no) {
+static int HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no) {
     int is_label = 0;
     int is_work_wth_ram = 0;
     char label[32] = {};
@@ -73,7 +79,7 @@ int HandleExistingArgument (int * command_type, long long * intarg, char * args,
     return 1;
 }
 
-int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails * label_arr, size_t * label_arr_ptr) {
+static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails * label_arr, size_t * label_arr_ptr) {
     size_t current_idx = 0;
     int line_no = 0;
     while (current_idx < buffer.nitems) {
@@ -108,7 +114,7 @@ int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails * labe
     return 0;
 }
 
-int ReadLinesFromBuffer(buffer_struct buffer) {
+static int ReadLinesFromBuffer(buffer_struct buffer) {
     size_t command_count = 0;
 
     label_entrails * label_arr = (label_entrails*)calloc(32, sizeof(label_entrails));
@@ -175,6 +181,9 @@ int ReadLinesFromBuffer(buffer_struct buffer) {
     fclose(file);
     return result;
 }
+
+//_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
 
 int Descript(void) {
     buffer_struct read = ReadFromFileToBuffer(crypted_file);
