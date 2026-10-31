@@ -1,38 +1,29 @@
 #include "../h/performer.h"
 
-const char * execute_file = "test-data/execute.txt";
+const char * execute_file = "test-data/execute.bin";
 
 //_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-
-
 int Perform(void) {
 
-    buffer_struct read = ReadFromFileToBuffer(execute_file);
-    if (read.buffer == NULL || read.nitems == 0) {
-        fprintf(stderr, "Nothing to read, ReadFromFile returned nothing\n");
+    FILE * file = fopen(execute_file, "rb");
+    if (!file) {
+        perror("fopen");
         return 1;
     }
 
-    size_t lines = count_lines_helper(read) + 1;
-    CommandEntrails *code = (CommandEntrails *)calloc(lines, sizeof(CommandEntrails));
-    if (code == NULL) {
-        fprintf(stderr, "calloc failed\n");
-        free(read.buffer);
-        return 1;
-    }
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
 
-    size_t code_size = 0;
-    const char * p = (char *)read.buffer;
+    size_t number_of_lines = size / sizeof(CommandEntrails);
+    CommandEntrails * code = (CommandEntrails *)calloc(number_of_lines, sizeof(CommandEntrails));
+    size_t got = fread(code, sizeof(CommandEntrails), number_of_lines, file);
+
+
     int num = 0, type = 0, consumed = 0;
     double val = 0;
-    while (code_size < lines && sscanf(p, "%d %d %lf%n", &num, &type, &val, &consumed) == 3) {
-        code[code_size].command_number = (STATES_CPU)num;
-        code[code_size].command_type   = type;
-        code[code_size].arg            = val;
-        code_size++;
-        p += consumed;
-    }
+
     cpu CPU = {};
     CPU.IP = 0;
     STACK_CONSTRUCTOR(&CPU.MAIN_DATA);
@@ -50,7 +41,7 @@ int Perform(void) {
         result = 1;
         break;
     }
-    if (CPU.IP >= code_size) {
+    if (CPU.IP >= number_of_lines) {
         fprintf(stderr, "IP out of range\n");
         result = 1;
         break;
@@ -70,6 +61,6 @@ int Perform(void) {
 //*********************************************************************************************************************************************************************************************************************************
 
     free(code);
-    free(read.buffer);
+   // free(read.buffer);
     return result;
 }

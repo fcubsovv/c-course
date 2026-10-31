@@ -2,7 +2,7 @@
 
 
 struct label_entrails {
-    char labe_name[32];
+    char labe_name[64];
     int label_address;
 };
 
@@ -41,9 +41,9 @@ static int find_label_in_label_arr (label_entrails * label_arr, size_t label_arr
 static int HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no) {
     int is_label = 0;
     int is_work_wth_ram = 0;
-    char label[32] = {};
-    char inner_arg[32] = {};
-    sscanf(args, "%31[^ ] %n", label, &is_label);
+    char label[64] = {};
+    char inner_arg[64] = {};
+    sscanf(args, " %31[^ ] %n", label, &is_label);
     sscanf(args, "[%31[^]]] %n", inner_arg, &is_work_wth_ram);
     if (is_work_wth_ram > 0) {
         *command_type |= (1 << 2);//врубаю третий биток
@@ -84,7 +84,7 @@ static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails
     int line_no = 0;
     while (current_idx < buffer.nitems) {
 
-    char line[128] = {};
+    char line[256] = {};
     size_t line_len = 0;
     get_command_line(&current_idx, buffer, line, sizeof(line), &line_len);
 
@@ -94,14 +94,14 @@ static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails
         continue;
     }
 
-    char command[32] = {};
-    char args[32] = {};
+    char command[64] = {};
+    char args[64] = {};
     int is_label = 0;
-    char label[32] = {};
+    char label[64] = {};
     if(sscanf(line, "%31s", command) <= 0) {
         continue;
     }
-    sscanf(line, "%31[^: ]: %n", label, &is_label);
+    sscanf(line, " %31[^: ;]: %n", label, &is_label);
     if (is_label > 0) {
         // add rashirenie massiva labels using realloc! ili pohui
         label_arr[*label_arr_ptr].label_address = *command_count;
@@ -117,10 +117,10 @@ static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails
 static int ReadLinesFromBuffer(buffer_struct buffer) {
     size_t command_count = 0;
 
-    label_entrails * label_arr = (label_entrails*)calloc(32, sizeof(label_entrails));
+    label_entrails * label_arr = (label_entrails*)calloc(64, sizeof(label_entrails));
     size_t label_arr_ptr = 0;
 
-    FILE * file = fopen(decrypted_file, "w"); //
+    FILE * file = fopen(decrypted_file, "wb"); //
     if (!file) {
         perror("error opening file");
         return -1;
@@ -134,8 +134,7 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
     size_t current_idx = 0;
     line_no = 0;
     while (current_idx < buffer.nitems) {
-        //CANCELLED sdelat ondelnuy def read_line, вынести мб в отдельную функцию просто разбиение этой срани на строки? и итерирывать по строгам , но вообще есть проблема с этим, а нет какая пробоема у меня первый проход просто формирует массив меток а второй прото его пропускает заебись так и сделаю
-        char line[128] = {};
+        char line[256] = {};
         size_t line_len = 0;
         get_command_line(&current_idx, buffer, line, sizeof(line), &line_len);
         line_no++;
@@ -143,10 +142,10 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
             continue;
         }
 
-        char command[32] = {};
-        char args[32] = {};
+        char command[64] = {};
+        char args[64] = {};
         int is_label = 0;
-        sscanf(line, "%31[^: ]: %n", command, &is_label);
+        sscanf(line, " %31[^:; ]: %n", command, &is_label);
         if (is_label > 0) {//if label than pohui on label
             continue;
         }
@@ -154,7 +153,7 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
         int res = sscanf(line, "%31s %31s", command, args);
         if (res <= 0) continue;// if nothing pohui next line
 
-        int command_number = find_command_in_commands(command);
+        STATES_CPU command_number = find_command_in_commands(command);
         int command_type = 0;
         long long intarg = 0;
 
@@ -167,7 +166,8 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
         if (res == 2) {
             int res = HandleExistingArgument(&command_type, &intarg, args, command_number, label_arr, label_arr_ptr, line_no);
             if (res == 1) {
-                fprintf(file, "%d %d %lld\n", command_number, command_type, intarg);
+                CommandEntrails com = {command_number, command_type, intarg};
+                fwrite(&com, sizeof(CommandEntrails), 1, file);
                 continue;
             } else if (res == -1) {
                 return -1;
@@ -176,7 +176,8 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
             command_type = 0;
             intarg = 0;
         }
-        fprintf(file, "%d %d %lld\n", command_number, command_type, intarg);
+        CommandEntrails com = {command_number, command_type, intarg};
+        fwrite(&com, sizeof(CommandEntrails), 1, file);
     }
     fclose(file);
     return result;

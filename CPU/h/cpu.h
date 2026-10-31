@@ -35,8 +35,8 @@ enum STATES_CPU {
     run_div_cpu     =4,//+
     run_out_cpu     =5,//+
     run_hlt_cpu     =6,//+
-    run_in_cpu      =7,//+//TODO написать тут что IN может быть с любыми аргументами при себе
-    run_call_cpu    =8,//додристочка+
+    run_in_cpu      =7,//+
+    run_call_cpu    =8,//+
     run_ret_cpu     =9,//+
     run_pop_cpu     =10,//++
     run_draw_cpu    =11,//
@@ -54,11 +54,12 @@ enum STATES_CPU {
 };
 
 enum argument_types {
-    no_argument     = 0,//0000
-    int_argument    = 1,//0001
-    reg_argument    = 2,//0010
-    ram_int_argument= 5,
-    ram_reg_argument= 6,
+    unreachable_arg = -1,
+    no_argument     = 0b0000,
+    int_argument    = 0b0001,
+    reg_argument    = 0b0010,
+    ram_int_argument= 0b0101,
+    ram_reg_argument= 0b0110,
 };
 
 //_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
