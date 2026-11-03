@@ -46,11 +46,11 @@ static int HandleExistingArgument (int * command_type, long long * intarg, char 
     sscanf(args, " %31[^ ] %n", label, &is_label);
     sscanf(args, "[%31[^]]] %n", inner_arg, &is_work_wth_ram);
     if (is_work_wth_ram > 0) {
-        *command_type |= (1 << 2);//врубаю третий биток
+        *command_type |= (1 << 2);
         if (sscanf(inner_arg, "%lld", &*intarg) == 1) {
-            *command_type |= (1 << 0);//включены первый и третий битки
+            *command_type |= (1 << 0);
         }
-        else if (strcmp(inner_arg, "AX") == 0) { *command_type |= (1 << 1); *intarg = 1; }//включены второй и третий битки
+        else if (strcmp(inner_arg, "AX") == 0) { *command_type |= (1 << 1); *intarg = 1; }
         else if (strcmp(inner_arg, "BX") == 0) { *command_type |= (1 << 1); *intarg = 2; }
         else if (strcmp(inner_arg, "CX") == 0) { *command_type |= (1 << 1); *intarg = 3; }
         else if (strcmp(inner_arg, "DX") == 0) { *command_type |= (1 << 1); *intarg = 4; }
@@ -101,7 +101,7 @@ static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails
     if(sscanf(line, "%31s", command) <= 0) {
         continue;
     }
-    sscanf(line, " %31[^: ;]: %n", label, &is_label);
+    sscanf(line, " %31[^: ]: %n", label, &is_label);
     if (is_label > 0) {
         // add rashirenie massiva labels using realloc! ili pohui
         label_arr[*label_arr_ptr].label_address = *command_count;
@@ -138,20 +138,24 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
         size_t line_len = 0;
         get_command_line(&current_idx, buffer, line, sizeof(line), &line_len);
         line_no++;
-        if (line_len == 0) {
-            continue;
-        }
+        if (line_len == 0) continue;
 
         char command[64] = {};
         char args[64] = {};
         int is_label = 0;
-        sscanf(line, " %31[^:; ]: %n", command, &is_label);
-        if (is_label > 0) {//if label than pohui on label
-            continue;
-        }
 
-        int res = sscanf(line, "%31s %31s", command, args);
-        if (res <= 0) continue;// if nothing pohui next line
+
+        // char first_char = '\0';
+        // int check = sscanf(line, " %c", &first_char);
+        // if (check <= 0 || first_char == ';') continue;
+        char * semi = strchr(line, ';');
+        if (semi) *semi = '\0';
+        if (line[strspn(line, " \t\r")] == '\0') continue;
+        sscanf(line, " %31[^: ]: %n", command, &is_label);
+        if (is_label > 0) continue;
+
+        int res = sscanf(line, " %31s %63s", command, args);
+        if (res <= 0) return 0;
 
         STATES_CPU command_number = find_command_in_commands(command);
         int command_type = 0;

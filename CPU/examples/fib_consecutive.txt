@@ -6,12 +6,15 @@ PUSH 1
 POP BX
 CALL fib
 HLT
+
 fib:
 PUSH DX
 PUSH 0
 JLE end
+
 PUSH AX
 OUT
+
 PUSH AX
 PUSH BX
 ADD
@@ -25,6 +28,8 @@ PUSH 1
 SUB
 POP DX
 JP fib
+
+
 end:
 RET
 HLT

@@ -1,38 +1,52 @@
-IN
-IN
-IN
-POP CX
-POP BX
-POP AX
-PUSH BX
-PUSH BX
-MUL
-PUSH 4
-PUSH AX
-MUL
-PUSH CX
-MUL
-SUB
-SQRT
-POP DX
-PUSH -1
-PUSH BX
-MUL
+CALL insert_ax_bx_cx
+CALL calculate_descriminant
+;--------------------------
+CALL get_minus_b
 PUSH DX
 ADD
-PUSH 2
-PUSH AX
-MUL
-DIV
-OUT
-PUSH -1
-PUSH BX
-MUL
+CALL devide_by_2a
+OUT                         ;out first root
+;--------------------------
+CALL get_minus_b
 PUSH DX
 SUB
-PUSH 2
-PUSH AX
-MUL
-DIV
-OUT
+CALL devide_by_2a
+OUT                         ;out second root
+;--------------------------
 HLT
+
+;*********functions********
+insert_ax_bx_cx:
+    IN
+    IN
+    IN
+    POP CX
+    POP BX
+    POP AX
+    RET
+;--------------------------
+calculate_descriminant:
+    PUSH BX
+    PUSH BX
+    MUL
+    PUSH 4
+    PUSH AX
+    MUL
+    PUSH CX
+    MUL
+    SUB
+    SQRT
+    POP DX
+    RET
+;---------------------------
+get_minus_b:
+    PUSH -1
+    PUSH BX
+    MUL
+    RET
+;---------------------------
+devide_by_2a:
+    PUSH 2
+    PUSH AX
+    MUL
+    DIV

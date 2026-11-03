@@ -1,0 +1,10 @@
+def fib(n){
+    if (n==1):
+        return 1
+    if (n==2):
+        return 1
+    n--;
+    return f(n-1) + f(n-2)
+
+
+}
