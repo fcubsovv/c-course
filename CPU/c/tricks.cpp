@@ -14,9 +14,10 @@ int GetColorArray(uint32_t * num_array, const  char * target_image) {
 }
 
 
-
 int GetTargetFile(uint32_t * num_array, const char * filename) {
+
     FILE * file = fopen(filename, "w");
+    fprintf(file, ";this file is auto generated. see c/tricks.cpp\n");
     for (size_t i = 0; i < 2500; i++) {
         fprintf(file, "PUSH %u\n", num_array[i]);
         fprintf(file, "POP [%zu]\n", i);
@@ -26,6 +27,7 @@ int GetTargetFile(uint32_t * num_array, const char * filename) {
     fclose(file);
     return 0;
 }
+
 
 int CreateTargetFileForDrawingPic() {
     uint32_t arr[2500] = {};

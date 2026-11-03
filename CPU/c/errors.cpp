@@ -1,18 +1,18 @@
 #include "../h/errors.h"
 
 
-char ERROR_MESSAGES[11][64] = {
-    "Unknown error in cpu",
-    "Error finding command",
-    "Error opening file",
-    "Error null ptr",
-    "Error ip out of range",
-    "Error unknown argument",
-    "Error unknown label",
-    "Error no such register",
-    "Error pushing",
-    "Error popping",
-    "Error unreachable jump"
+const char * ERROR_MESSAGES[11] = {
+    "ERROR Unknown error in cpu",
+    "ERROR finding command",
+    "ERROR opening file",
+    "ERROR null ptr",
+    "ERROR ip out of range",
+    "ERROR unknown argument",
+    "ERROR unknown label",
+    "ERROR no such register",
+    "ERROR pushing",
+    "ERROR popping",
+    "ERROR unreachable jump"
 };
 
 
