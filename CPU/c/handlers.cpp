@@ -20,8 +20,7 @@ static STATES_CPU CheckIfValidRegisterNumber(long long arg) {
     if ((arg) >= ax && (arg) <= dx) {
         return read_command_cpu;
     } else {
-        perror("No such register!");
-        return error_cpu;
+        return error_no_such_register;
     }
 }
 
@@ -62,8 +61,7 @@ STATES_CPU HandlePush               (CommandEntrails command_entrails, cpu * CPU
             StackPush(&CPU->MAIN_DATA, CPU->RAM[(size_t)CPU->registers[command_entrails.arg - 1]]);
             break;
         default:
-            perror("nothing to push");
-            return error_cpu;
+            return error_pushing;
             break;
     }
 
@@ -89,8 +87,7 @@ STATES_CPU HandlePop                (CommandEntrails command_entrails, cpu * CPU
             CPU->RAM[(size_t)CPU->registers[command_entrails.arg - 1]] = popped_val;
             break;
         default:
-            perror("nothing to push");
-            return error_cpu;
+            return error_popping;
             break;
         }
     return read_command_cpu;
@@ -202,8 +199,8 @@ STATES_CPU HandleJump               (CommandEntrails command_entrails, cpu * CPU
             CPU->IP = CPU->RAM[(size_t)CPU->registers[command_entrails.arg - 1]];
             break;
         default:
-            printf("unreachable argument in jump line %d\n", CPU->IP);
-            return error_cpu;
+            printf("unreachable argument in jump line %zu\n", CPU->IP);
+            return error_unreachable_jump;
             break;
     }
     return read_command_cpu;

@@ -4,18 +4,18 @@ OUT
 HLT
 
 factorial:
-POP AX
-PUSH AX
-PUSH 1
-JLE retone
-PUSH AX
-PUSH AX
-PUSH 1
-SUB
-CALL factorial
-MUL
-RET
+    POP AX
+    PUSH AX
+    PUSH 1
+    JLE retone
+    PUSH AX
+    PUSH AX
+    PUSH 1
+    SUB
+    CALL factorial
+    MUL
+    RET
 
 retone:
-PUSH 1
-RET
+    PUSH 1
+    RET

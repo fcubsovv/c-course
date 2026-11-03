@@ -7,7 +7,9 @@
 #include "../h/commands.h"
 #include "helpers.h"
 #include "../../global_utils/h/filework.h"
+#include "_FILES_.h"
+#include "errors.h"
 
-int Perform(void);
+STATES_CPU Perform(void);
 
 #endif

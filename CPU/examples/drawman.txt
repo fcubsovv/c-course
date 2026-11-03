@@ -2,17 +2,17 @@ PUSH 1200
 POP AX
 
 loop:
-PUSH AX
-PUSH 1300
-JGE end
-PUSH 4278190335
-POP [AX]
-PUSH AX
-PUSH 1
-ADD
-POP AX
-JP loop
+    PUSH AX
+    PUSH 1300
+    JGE end
+    PUSH 4278190335
+    POP [AX]
+    PUSH AX
+    PUSH 1
+    ADD
+    POP AX
+    JP loop
 
 end:
-DRAW
-HLT
+    DRAW
+    HLT

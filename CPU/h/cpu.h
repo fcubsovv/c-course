@@ -28,6 +28,7 @@ enum REGISTERS {
 };
 
 enum STATES_CPU {
+    allright        =0,
     read_command_cpu=0,
     run_push_cpu    =1,//++
     run_add_cpu     =2,//+
@@ -51,6 +52,16 @@ enum STATES_CPU {
     run_jne_cpu     =20,//+
     run_jp_cpu      =21,//+
     error_cpu       =-1,
+    error_finding_command = -2,
+    error_opening_file    = -3,
+    error_null_ptr        = -4,
+    error_ip_out_of_range = -5,
+    error_unknown_argument= -6,
+    error_unknown_label   = -7,
+    error_no_such_register= -8,
+    error_pushing         = -9,
+    error_popping         = -10,
+    error_unreachable_jump= -11,
 };
 
 enum argument_types {

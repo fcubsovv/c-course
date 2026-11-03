@@ -7,9 +7,9 @@ struct label_entrails {
 };
 
 static int get_command_line (size_t * current_idx, buffer_struct buffer, char * line, size_t line_size, size_t * line_len);
-static int find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, char * label_name, long long * intarg, int * command_type) ;
+static STATES_CPU find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, char * label_name, long long * intarg, int * command_type) ;
 
-static int HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no);
+static STATES_CPU HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no);
 static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails * label_arr, size_t * label_arr_ptr);
 
 //_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
@@ -27,18 +27,18 @@ static int get_command_line (size_t * current_idx, buffer_struct buffer, char * 
     return 0;
 }
 
-static int find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, char * label_name, long long * intarg, int * command_type)  {
+static STATES_CPU find_label_in_label_arr (label_entrails * label_arr, size_t label_arr_size, char * label_name, long long * intarg, int * command_type)  {
     for (size_t i = 0; i < label_arr_size; i++) {
         if(strcmp(label_arr[i].labe_name, label_name) == 0) {
             (*intarg) = label_arr[i].label_address;
             *command_type = 1;
-            return 1;
+            return allright;
         }
     }
-    return -1;
+    return error_unknown_label;
 }
 
-static int HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no) {
+static STATES_CPU HandleExistingArgument (int * command_type, long long * intarg, char * args, int command_number, label_entrails * label_arr, size_t label_arr_ptr, int line_no) {
     int is_label = 0;
     int is_work_wth_ram = 0;
     char label[64] = {};
@@ -54,7 +54,7 @@ static int HandleExistingArgument (int * command_type, long long * intarg, char 
         else if (strcmp(inner_arg, "BX") == 0) { *command_type |= (1 << 1); *intarg = 2; }
         else if (strcmp(inner_arg, "CX") == 0) { *command_type |= (1 << 1); *intarg = 3; }
         else if (strcmp(inner_arg, "DX") == 0) { *command_type |= (1 << 1); *intarg = 4; }
-        return 1;
+        return allright;
     }
 
     if (sscanf(args, "%lld", intarg) == 1) {
@@ -69,14 +69,14 @@ static int HandleExistingArgument (int * command_type, long long * intarg, char 
     else if(is_label > 0) {
         if(find_label_in_label_arr(label_arr, label_arr_ptr, label, intarg, command_type) == -1) {
             printf("error label in line %d", line_no);
-            return -1;
+            return error_unknown_label;
         };
     }
     else {
         printf("error unknown argument in line %d", line_no);
-        return -1;
+        return error_unknown_argument;
     }
-    return 1;
+    return allright;
 }
 
 static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails * label_arr, size_t * label_arr_ptr) {
@@ -103,7 +103,6 @@ static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails
     }
     sscanf(line, " %31[^: ]: %n", label, &is_label);
     if (is_label > 0) {
-        // add rashirenie massiva labels using realloc! ili pohui
         label_arr[*label_arr_ptr].label_address = *command_count;
         strcpy(label_arr[*label_arr_ptr].labe_name, label);
         (*label_arr_ptr)++;
@@ -114,19 +113,22 @@ static int FirstRun(size_t * command_count, buffer_struct buffer, label_entrails
     return 0;
 }
 
-static int ReadLinesFromBuffer(buffer_struct buffer) {
+static STATES_CPU ReadLinesFromBuffer(buffer_struct buffer) {
+    if (buffer.buffer == NULL) {
+        return error_null_ptr;
+    }
+
     size_t command_count = 0;
 
     label_entrails * label_arr = (label_entrails*)calloc(64, sizeof(label_entrails));
     size_t label_arr_ptr = 0;
 
-    FILE * file = fopen(decrypted_file, "wb"); //
+    FILE * file = fopen(execute_file, "wb");
     if (!file) {
-        perror("error opening file");
-        return -1;
+        return error_opening_file;
     }
     //первый проход
-    int result = 0;
+    STATES_CPU result = allright;
     int line_no = 0;
     FirstRun(&command_count, buffer, label_arr, &label_arr_ptr);
 
@@ -144,37 +146,34 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
         char args[64] = {};
         int is_label = 0;
 
-
-        // char first_char = '\0';
-        // int check = sscanf(line, " %c", &first_char);
-        // if (check <= 0 || first_char == ';') continue;
         char * semi = strchr(line, ';');
         if (semi) *semi = '\0';
-        if (line[strspn(line, " \t\r")] == '\0') continue;
+        char *p = line;
+        while (isspace((unsigned char)*p)) p++;
+            if (*p == '\0') continue;
         sscanf(line, " %31[^: ]: %n", command, &is_label);
         if (is_label > 0) continue;
 
         int res = sscanf(line, " %31s %63s", command, args);
-        if (res <= 0) return 0;
+        if (res <= 0) continue;
 
         STATES_CPU command_number = find_command_in_commands(command);
         int command_type = 0;
         long long intarg = 0;
 
-        if (command_number == -1) {
-            printf("line %d: unavaliable command'%s'\n",  line_no, command);
-            result = -1;
+        if (command_number < 0) {
+            result = command_number;
             break;
         }
 
         if (res == 2) {
-            int res = HandleExistingArgument(&command_type, &intarg, args, command_number, label_arr, label_arr_ptr, line_no);
-            if (res == 1) {
+            STATES_CPU res = HandleExistingArgument(&command_type, &intarg, args, command_number, label_arr, label_arr_ptr, line_no);
+            if (res == allright) {
                 CommandEntrails com = {command_number, command_type, intarg};
                 fwrite(&com, sizeof(CommandEntrails), 1, file);
                 continue;
-            } else if (res == -1) {
-                return -1;
+            } else if (res < 0) {
+                return res;
             }
         } else {
             command_type = 0;
@@ -190,20 +189,25 @@ static int ReadLinesFromBuffer(buffer_struct buffer) {
 //_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 
-int Descript(void) {
+STATES_CPU Descript(void) {
+
     buffer_struct read = ReadFromFileToBuffer(crypted_file);
     if (read.buffer == NULL || read.nitems == 0) {
         printf("Nothing to read, ReadFromFile returned nothing");
-        return 0;
+        return error_null_ptr;
     }
-    int result = ReadLinesFromBuffer(read);
+
+    STATES_CPU result = ReadLinesFromBuffer(read);
     free(read.buffer);
-    if (result != 0) {
+
+    if (result != allright) {
         fprintf(stderr, "description failed.\n");
-        return 1;
+        ErrorPuts(result, GETFILE_CPU(result), GETFUNCTION_CPU(), GETLINE_CPU());
+        return result;
     }
+
     puts("description finished successfully.");
-    return 0;
+    return allright;
 }
 
 

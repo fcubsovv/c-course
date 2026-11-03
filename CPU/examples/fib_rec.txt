@@ -34,6 +34,7 @@ fib:
 if_n_one:
     PUSH 0
     RET
+
 if_n_is_two:
     PUSH 1
     RET
