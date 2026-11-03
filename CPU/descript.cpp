@@ -1,8 +1,8 @@
 #include "h/descriptor.h"
-#include "h/tricks.h"
+//#include "h/tricks.h"
 
 int main(void) {
-    CreateTargetFileForDrawingPic();
+   // CreateTargetFileForDrawingPic();
     Descript();
     return 0;
 }

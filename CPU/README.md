@@ -32,6 +32,16 @@ Features:
     Массив команд имеет вид {"COMMAND NAME", command_number_cpu, CommandHandler}
 
     В файле tricks можно найти кодогенерацию для всяких приколов, чтобы их посмотреть нужно добавлять в descript.cpp нужные функции - которые генерируют код в test-data для реализации тех самых tricks
+    example descript.cpp {
+        #include "h/descriptor.h"
+        //#include "h/tricks.h"
+
+        int main(void) {
+        // CreateTargetFileForDrawingPic();
+            Descript();
+            return 0;
+        }
+    }
 
 
 About file structure:

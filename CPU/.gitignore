@@ -1,6 +1,5 @@
 stack_debug.log
-main
-/test-data
+
 compile.sh
 
 /h/raylib.h
