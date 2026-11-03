@@ -12,8 +12,8 @@ typedef double data_type;
 #define REARGUARD 0xBADCAFE1BADB0015ULL
 #define POISON_VALUE 6666.66666
 #define ARR_VANGUARD 7777.77777
-ERROR_CODES print_double(void * data_el_ptr);
-ERROR_CODES fprintf_double(void * data_el_ptr, FILE * log);
+ERROR_CODES_STACK print_double(void * data_el_ptr);
+ERROR_CODES_STACK fprintf_double(void * data_el_ptr, FILE * log);
 #endif
 
 

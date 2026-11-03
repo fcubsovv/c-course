@@ -12,7 +12,7 @@
 #include "junky_generator.cpp"
 
 #include "comparators.cpp"
-#include "../global_utils/filework.cpp"
+#include "../global_utils/h/filework.h"
 
 #include "../global_utils/colors.cpp"
 

@@ -1,4 +1,5 @@
 - [ ] Global Lib for logging
 - [ ] Better error logging in __STACK__
 - [ ] Come up ith better logic of choosing mode for stack lib! NOw its DRASTICC
-
+- [ ] Unified folder structure for all projects
+- [ ] Separated compilation of lib files

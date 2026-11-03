@@ -1,6 +1,7 @@
 stack_debug.log
-
+assembler
+cpu
 compile.sh
-
+TODO.md
 /h/raylib.h
 

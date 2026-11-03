@@ -15,5 +15,5 @@
 - [x] Eдинообразие ошибок по всему проекту
 - [x] Eдинообразие файлов которые используются
 - [x] Funcrtion for entering arguments and command
-
+- [x] Angry nirds
 

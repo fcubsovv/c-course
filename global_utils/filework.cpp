@@ -1,20 +1,9 @@
-#ifndef FILEWORK
-#define FILEWORK
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-struct buffer_struct {
-    unsigned char * buffer;
-    size_t nitems;
-};
+#include "h/filework.h"
 
 buffer_struct ReadFromFileToBuffer(const char * file_name) {
     buffer_struct answer = {
         NULL,
-        NULL
+        0
     };
     int file = open(file_name, O_RDONLY, 0);
     if (file == -1) {
@@ -44,4 +33,4 @@ buffer_struct ReadFromFileToBuffer(const char * file_name) {
     };
     return answer;
 }
-#endif
+

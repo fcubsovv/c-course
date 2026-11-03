@@ -11,8 +11,6 @@ C course made by DED, based on project-way thinking
 ├── onegin/               # ONEGIN: Optimizing line sorting for huge textes
 │   └── test_data/        # Inner folder with test samples
 ├── sorting               # Self-written sorting functions, include qsort, bubsort, mergesort
-├── stack                 # Self-written _STACK_ lib for using stack data structure. Created for further usage in SPU project
-├── CPU                   # Self written virtual CPU, including assembler&cpu, cpu based on state-machine
 ```
 
 ## 🚀 QUICK START
@@ -22,6 +20,9 @@ Since this repository does not use complex build systems, every project is compi
 ### Prerequisites
 * `g++` compiler supporting C++17 / C11 standards.
 
+### Example
+    If inside directory there are instructions use them, otherwise use following:
+
 ### Example 1: Compiling a single project (e.g., `sorting`)
 Navigate to the project folder and compile the source files directly:
 ```bash
@@ -29,3 +30,4 @@ cd sorting
 g++ main.cpp sorting.cpp -o sorting_demo
 ./sorting_demo
 ```
+### Example

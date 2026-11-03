@@ -1,20 +1,18 @@
 #include "../h/_STACK_.h"
 
 
-ERROR_CODES StackPush(stack * stack, data_type element) {
+ERROR_CODES_STACK StackPush(stack * stack, data_type element) {
     STACK_LOG(stack);
-    ERROR_CODES code = CheckStack(stack);
-    if (code != allright) {
+    ERROR_CODES_STACK code = CheckStack(stack);
+    if (code != allright_stack) {
         return code;
     }
-    printf("element %lg\n",   element);
-    printf("element %lg\n",   element);
     if (stack->size >= stack->capacity) {
         stack->capacity*=2;
         data_type * arr = (data_type *)realloc(stack->data, (stack->capacity + 2) * sizeof(data_type));
 
         if (arr == NULL) {
-            return memory_allocation_error;
+            return memory_allocation_error_stack;
         }
         stack->data = arr;
         for (size_t i = stack->size+1; i < stack->capacity + 2; i++) {
@@ -26,37 +24,38 @@ ERROR_CODES StackPush(stack * stack, data_type element) {
     stack->size+=1;
     stack->data_hash =  CalculateCRC32(stack->data, sizeof(data_type) * (stack->capacity+2));
     stack->struct_hash =  CalculateCRC32(stack, offsetof(struct stack, struct_hash));
+    STACK_LOG(stack);
     code = CheckStack(stack);
-    if (code != allright) {
+    if (code != allright_stack) {
         return code;
     }
-    return allright;
+    return allright_stack;
 }
 
 
 
 
 
-ERROR_CODES StackPop(stack * stack, data_type * popped_el) {
+ERROR_CODES_STACK StackPop(stack * stack, data_type * popped_el) {
     STACK_LOG(stack);
-    ERROR_CODES code = CheckStack(stack);
-    if (code != allright) {
+    ERROR_CODES_STACK code = CheckStack(stack);
+    if (code != allright_stack) {
         return code;
     }
     if (popped_el == NULL) {
-        return null_ptr;
+        return null_ptr_stack;
     }
     if (stack->size == 0) {
-        return zero_size;
+        return zero_size_stack;
     }
-    popped_el = &stack->data[stack->size];
+    *popped_el = stack->data[stack->size];
     stack->data[stack->size] = POISON_VALUE;
     stack->size-=1;
-    if (stack->size < stack->capacity/2) {
+    if ((stack->size)*2 < stack->capacity/2) {
         stack->capacity/=2;
         data_type * arr = (data_type *)realloc(stack->data, (stack->capacity + 2) * sizeof(data_type));
         if (arr == NULL) {
-            return memory_allocation_error;
+            return memory_allocation_error_stack;
         }
         stack->data = arr;
         for (size_t i = stack->size+1; i < stack->capacity + 2; i++) {
@@ -67,20 +66,19 @@ ERROR_CODES StackPop(stack * stack, data_type * popped_el) {
     stack->struct_hash = CalculateCRC32(stack, offsetof(struct stack, struct_hash));
     STACK_LOG(stack);
     code = CheckStack(stack);
-    if (code != allright) {
+    if (code != allright_stack) {
         return code;
     }
-    return allright;
+    return allright_stack;
 }
 
-ERROR_CODES StackConstructor (stack * stack, const char * varname, const char * function_called_constructor, const char * file_called_constructor) {//FIX timecheck function
-    STACK_LOG(stack);
-    if (stack == NULL) return null_ptr_to_struct;
+ERROR_CODES_STACK StackConstructor (stack * stack, const char * varname, const char * function_called_constructor, const char * file_called_constructor) {//FIX timecheck function
+    if (stack == NULL) return null_ptr_to_struct_stack;
     stack->capacity = 8;
     stack->size = 0;
     data_type * arr = (data_type *)calloc((stack->capacity + 2), sizeof(data_type));
     if (arr == NULL) {
-        return memory_allocation_error;
+        return memory_allocation_error_stack;
     }
     stack->data = arr;
     for (size_t i = 1; i < stack->capacity + 2; i++) {
@@ -105,21 +103,21 @@ ERROR_CODES StackConstructor (stack * stack, const char * varname, const char * 
     stack->struct_hash = CalculateCRC32(stack, offsetof(struct stack, struct_hash));//
 
     STACK_LOG(stack);
-    ERROR_CODES code = CheckStack(stack);
-    if (code != allright) {
+    ERROR_CODES_STACK code = CheckStack(stack);
+    if (code != allright_stack) {
         return code;
     }
 
-    return allright;
+    return allright_stack;
 
 }
 
 
-ERROR_CODES StackDestructor(stack * stack) {
+ERROR_CODES_STACK StackDestructor(stack * stack) {
     STACK_LOG(stack);
-    if (stack == NULL) return null_ptr_to_struct;
-    ERROR_CODES code = CheckStack(stack);
-    if (code != allright) {
+    if (stack == NULL) return null_ptr_to_struct_stack;
+    ERROR_CODES_STACK code = CheckStack(stack);
+    if (code != allright_stack) {
         return code;
     }
     if (stack->data != NULL) {
@@ -140,16 +138,16 @@ ERROR_CODES StackDestructor(stack * stack) {
     memset(&stack->timeinfo, 0, sizeof(tm));
     stack->vanguard  = 0xDEADBEEF;
     stack->rearguard = 0xDEADBEEF;
-    return allright;
+    return allright_stack;
 }
 
-ERROR_CODES StackCopy(const stack * original, stack * parody, const   char * function_called_copy, const char * file_called_copy, const char * varname) {
+ERROR_CODES_STACK StackCopy(const stack * original, stack * parody, const   char * function_called_copy, const char * file_called_copy, const char * varname) {
     STACK_LOG(original);
-    ERROR_CODES code = CheckStack(original);
-    if (code != allright) {
+    ERROR_CODES_STACK code = CheckStack(original);
+    if (code != allright_stack) {
         return code;
     }
-    if (parody == NULL) return null_ptr_to_struct;
+    if (parody == NULL) return null_ptr_to_struct_stack;
 
     StackConstructor(parody, varname, function_called_copy, file_called_copy);
     for (size_t i = 1; i < original->size+1; i++) {
@@ -161,11 +159,11 @@ ERROR_CODES StackCopy(const stack * original, stack * parody, const   char * fun
 
     STACK_LOG(parody);
     code = CheckStack(parody);
-    if (code != allright) {
+    if (code != allright_stack) {
         return code;
     }
 
-    return allright;
+    return allright_stack;
 }
 
 

@@ -5,7 +5,7 @@
 const char * ERROR_FILE_NAME = "error_logger.log";
 
 
-ERROR_CODES ErrorDump(ERROR_CODES error_code, const char * function, const char * file, int line, const char * error_message) {
+ERROR_CODES_STACK ErrorDump(ERROR_CODES_STACK error_code, const char * function, const char * file, int line, const char * error_message) {
 
     fprintf(stderr, "%s: %s\n", error_message, strerror(errno));
     fprintf(stderr, "in : %s in %d line in %s() \n", file, line, function);
@@ -14,7 +14,7 @@ ERROR_CODES ErrorDump(ERROR_CODES error_code, const char * function, const char 
     if (log == NULL) {
         fprintf(stderr, "Error opening file: %s\n", strerror(errno));
         fprintf(stderr, "in : %s in %d line in %s() \n", file, line, function);
-        return cannot_open_file;
+        return cannot_open_file_stack;
     }
 
     fprintf(log, "==========ERROR OCCURRED============\n");
@@ -27,8 +27,8 @@ ERROR_CODES ErrorDump(ERROR_CODES error_code, const char * function, const char 
     if(fclose(log) != 0) {
         fprintf(stderr, "Error closing stack log file%s\n", strerror(errno));
         fprintf(stderr,"in : %s in %d line in %s() \n", file, line, function);
-        return cannot_close_log_file;
+        return cannot_close_log_file_stack;
     }
 
-    return allright;
+    return allright_stack;
 }

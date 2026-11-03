@@ -36,12 +36,12 @@ struct stack {
     uintptr_t rearguard;
 };
 
-ERROR_CODES PrintStack(stack * stack, ERROR_CODES printer(void *))  ;
+ERROR_CODES_STACK PrintStack(stack * stack, ERROR_CODES_STACK printer(void *))  ;
 
-ERROR_CODES FprintfStack(const stack * stack, FILE * log, ERROR_CODES fprinter(void *, FILE *)) ;
+ERROR_CODES_STACK FprintfStack(const stack * stack, FILE * log, ERROR_CODES_STACK fprinter(void *, FILE *)) ;
 
-ERROR_CODES CheckStack(const stack * stack) ;
+ERROR_CODES_STACK CheckStack(const stack * stack) ;
 
-ERROR_CODES DumpStack(const stack * stack, const char * file, int line, const char * func, ERROR_CODES code, ERROR_CODES fprint_stack_el(void *, FILE *)) ;
+ERROR_CODES_STACK DumpStack(const stack * stack, const char * file, int line, const char * func, ERROR_CODES_STACK code, ERROR_CODES_STACK fprint_stack_el(void *, FILE *)) ;
 
 #endif

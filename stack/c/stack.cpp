@@ -1,22 +1,22 @@
 #include "../h/stack.h"
 
 
-ERROR_CODES PrintStack(stack * stack, ERROR_CODES printer(void *)) {
+ERROR_CODES_STACK PrintStack(stack * stack, ERROR_CODES_STACK printer(void *)) {
     for (size_t i = 0; i < stack->capacity + 2; i++) {
         printer(&stack->data[i]);
     }
-    return allright;
+    return allright_stack;
 }
 
-ERROR_CODES FprintfStack(const stack * stack, FILE * log, ERROR_CODES fprinter(void *, FILE *)) {
+ERROR_CODES_STACK FprintfStack(const stack * stack, FILE * log, ERROR_CODES_STACK fprinter(void *, FILE *)) {
     if (stack == NULL) {
-        return null_ptr_to_struct;
+        return null_ptr_to_struct_stack;
     }
     char time_str[20] = {};
     size_t result = strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S",  &stack->timeinfo);
     if (result == 0) {
-        ErrorDump(cannot_format_time, GETFILE, GETFUNCTION, GETLINE, "Cannot format time info, not enough place in buffer");
-        return cannot_format_time;
+        ErrorDump(cannot_format_time_stack, GETFILE, GETFUNCTION, GETLINE, "Cannot format time info, not enough place in buffer");
+        return cannot_format_time_stack;
     }
 
     fprintf(log, "STACK ENTRAILS: \n");
@@ -28,19 +28,19 @@ ERROR_CODES FprintfStack(const stack * stack, FILE * log, ERROR_CODES fprinter(v
     fprintf(log, "---->STACK: \n");
     fprintf(log, "------>STACK DATA = ");//
     for (size_t i = 1; i < stack->capacity; i++) {
-        ERROR_CODES res = fprinter(&stack->data[i], log);
+        ERROR_CODES_STACK res = fprinter(&stack->data[i], log);
     }
     fprintf(log, "\n");
     fprintf(log, "---->VANGUARD: 0x%llx\n", (unsigned long long)stack->vanguard);
     fprintf(log, "---->REARGUARD: 0x%llx\n", (unsigned long long)stack->rearguard);
     fprintf(log, "STACK WAS CREATED IN : %s in %s() in %d line\n", stack->created_in_file, stack->created_by_function, stack->line);
     fprintf(log, "STACK WAS CREATED AT: [%s] \n", time_str);
-    return allright;
+    return allright_stack;
 }
 
-ERROR_CODES CheckStack(const stack * stack) {///canary death hash death
+ERROR_CODES_STACK CheckStack(const stack * stack) {///canary death hash death
     if (stack == NULL) {
-        return null_ptr_to_struct;
+        return null_ptr_to_struct_stack;
     }
     if (stack->vanguard != (VANGUARD ^ (uintptr_t)stack)) {
         return invalid_vanguard;
@@ -52,7 +52,7 @@ ERROR_CODES CheckStack(const stack * stack) {///canary death hash death
         return stack_data_interruption_start;
     }
     if (stack->capacity == 0) {
-        return zero_capacity;
+        return zero_capacity_stack;
     }
     if(stack->size > stack->capacity) {
         return size_bigger_than_capacity;
@@ -83,32 +83,32 @@ ERROR_CODES CheckStack(const stack * stack) {///canary death hash death
     if(stack->timeinfo.tm_year == 0) {
         return invalid_time_data;
     }
-    return allright;
+    return allright_stack;
 }
 
-ERROR_CODES DumpStack(const stack * stack, const char * file, int line, const char * func, ERROR_CODES code, ERROR_CODES fprint_stack_el(void *, FILE *)) {
+ERROR_CODES_STACK DumpStack(const stack * stack, const char * file, int line, const char * func, ERROR_CODES_STACK code, ERROR_CODES_STACK fprint_stack_el(void *, FILE *)) {
     FILE * log = fopen("stack_debug.log", "a");
     if (log == NULL) {
-        ErrorDump(cannot_open_file, GETFILE, GETFUNCTION, GETLINE, "Error opening file");
-        return cannot_open_file;
+        ErrorDump(cannot_open_file_stack, GETFILE, GETFUNCTION, GETLINE, "Error opening file");
+        return cannot_open_file_stack;
     }
     time_t time_ = time(NULL);
     if (time_ == (time_t)-1) {
-        ErrorDump(cannot_get_time, GETFILE, GETFUNCTION, GETLINE, "Error getting the time");
-        return cannot_get_time;
+        ErrorDump(cannot_get_time_stack, GETFILE, GETFUNCTION, GETLINE, "Error getting the time");
+        return cannot_get_time_stack;
     }
     struct tm * timeinfo = localtime(&time_);
     if (timeinfo == NULL) {
-        ErrorDump(cannot_get_time_info, GETFILE, GETFUNCTION, GETLINE, "Cannot get time info, cannot convert time format");
-        return cannot_get_time_info;
+        ErrorDump(cannot_get_time_info_stack, GETFILE, GETFUNCTION, GETLINE, "Cannot get time info, cannot convert time format");
+        return cannot_get_time_info_stack;
     }
     char time_str[20] = {};
     size_t result = strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", timeinfo);
     if (result == 0) {
-        ErrorDump(cannot_format_time, GETFILE, GETFUNCTION, GETLINE, "Cannot format time info, not enough place in buffer");
-        return cannot_format_time;
+        ErrorDump(cannot_format_time_stack, GETFILE, GETFUNCTION, GETLINE, "Cannot format time info, not enough place in buffer");
+        return cannot_format_time_stack;
     }
-    if (code == null_ptr || code == null_ptr_to_struct || code == stack_data_interruption_start || code == stack_data_interruption_end || code == invalid_vanguard || code == invalid_rearguard || code == invalid_struct_hash || code == invalid_data_hash) {
+    if (code == null_ptr_stack || code == null_ptr_to_struct_stack || code == stack_data_interruption_start || code == stack_data_interruption_end || code == invalid_vanguard || code == invalid_rearguard || code == invalid_struct_hash || code == invalid_data_hash) {
         fprintf(log, "==========ERROR OCCURRED============\n");
         fprintf(log, "ERROR CODE: %d\n", code);
         fprintf(log, "ERROR MESSAGE: %s\n", ERRORS[code].error_message );
@@ -125,9 +125,9 @@ ERROR_CODES DumpStack(const stack * stack, const char * file, int line, const ch
     FprintfStack(stack, log, fprint_stack_el);
     fprintf(log, "================END=================\n");
     if(fclose(log) != 0) {
-        ErrorDump(cannot_close_log_file, GETFILE, GETFUNCTION, GETLINE, "Error closing stack log file");
-        return cannot_close_log_file;
+        ErrorDump(cannot_close_log_file_stack, GETFILE, GETFUNCTION, GETLINE, "Error closing stack log file");
+        return cannot_close_log_file_stack;
     }
-    return allright;
+    return allright_stack;
 }
 

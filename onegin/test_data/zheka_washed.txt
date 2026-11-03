@@ -65,7 +65,7 @@ Unforced, as conversation passed,
 he had the talent of saluting
 felicitously every theme,
 of listening like a judge-supreme
-while serious topics were disputing,
+while serious topics were dicputing,
 or, with an epigram-surprise,
 of kindling smiles in ladies' eyes.
 Now Latin's gone quite out of favour;
@@ -342,7 +342,7 @@ and entered. Ballroom overflowing...
 and band already tired of blowing,
 while a mazurka holds the crowd;
 and everything is cramped and loud;
-spurs of Chevalier Gardes are clinking,
+cpurs of Chevalier Gardes are clinking,
 dear ladies' feet fly past like hail,
 and on their captivating trail
 incendiary looks are slinking,
@@ -560,7 +560,7 @@ on most occasions between friends,
 a great attraction to conversing.
 At first Onegin's tongue produced
 a haze in me, but  grew used
-to his disputing and his cursing;
+to his dicputing and his cursing;
 his virulence that made you smile,
 his epigrams topped up with bile.
 L
@@ -1009,7 +1009,7 @@ the universe is all perfection;
 youth is a fever; we must spare
 its natural right to rave and flare.
 Between them, every topic started
-reflection or provoked dispute:
+reflection or provoked dicpute:
 treaties of nations long departed,
 and good and ill, and learning's fruit,
 the prejudices of the ages,
@@ -3289,7 +3289,7 @@ are here untouched by fashion's reign,
 our modern Russia's plague and bane.
 L
 ... ...
-&lt; Petushk&oacute;v's nails and spurs are sounding
+&lt; Petushk&oacute;v's nails and cpurs are sounding
 (that half-pay archivist); and bounding
 Buy&aacute;nov's heels have split the wood
 and wrecked the flooring-boards for good;
@@ -4127,7 +4127,7 @@ onto the porch, and fussed about
 over the business of leave-taking,
 Tatyana went with them, and sped
 the carriage of the newly-wed.
-And long, as if through mists that spurted,
+And long, as if through mists that cpurted,
 Tanya pursued them with her gaze...
 So there she stood, forlorn, deserted!
 The comrade of so many days,
