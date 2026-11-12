@@ -1,8 +1,6 @@
 #include "../h/tests.h"
 #define GETNAME(x) #x
-//тест создает рандомный список целых числел длиной от 0 до 32
-//потом создает массив целых чисел случайных в диапазоне целых числел. Все нули - pop,
-//остальные - пуши. Вероятность нуля >~ 30%
+
 list_struct CreateRundomList() {
     list_struct list = {};
     HandleListConstruct_list_handlers(&list);
@@ -42,6 +40,9 @@ list_struct CreateRundomList() {
     return list;
 }
 
+//тест создает рандомный список целых числел длиной от 0 до 32
+//потом создает массив целых чисел случайных в диапазоне целых числел. Все нули - pop,
+//остальные - пуши. Вероятность нуля >~ 30%
 test_params RunRundomPushPopTest () {
     list_struct list = {};
     HandleListConstruct_list_handlers(&list);
@@ -125,7 +126,8 @@ test_params RunRundomPushPopTest () {
 
     return result;
 }
-
+//тест создает рандомный list
+//потом создает массив комманд и индексов, если число больше нуля - оно вставляется по индексу, если меньше нуля - выполняется pull по этому индексу
 test_params RunRandomInsertByIdxTest() {
     list_struct list = CreateRundomList();
 
@@ -134,12 +136,13 @@ test_params RunRandomInsertByIdxTest() {
     size_t index = 0;
     int val = 0;
     size_t num_of_tests = (rand() % (8 - 0 + 1)) + 0;
+    printf("%d\n", num_of_tests);
     int * command_args = (int *) calloc(sizeof(int), num_of_tests);
     int * indexes = (int *) calloc(sizeof(int), num_of_tests);
 
     for (size_t i = 0; i < num_of_tests; i++) {
         command_args[i] = (rand() % (100 - (-100) + 1)) - 100;
-        index = (rand() % (list.length + 1));
+        index = (rand() % (list.length - 1));
         indexes[i] = index;
         if ( command_args[i] >=0 ) HandleInsertByIndex_list_handlers(&list, index, command_args[i]);
         else HandlePullElByIndex_list_handles(&list, index, &val);

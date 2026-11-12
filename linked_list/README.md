@@ -3,15 +3,36 @@
 # REPO STRUCTURE
 
 ```text
-├── global_utils/         # Tools and useful scripts used across the project
-├── matrix/               # Training with printing matrixes of different shapes
-├── onegin/               # ONEGIN: Optimizing line sorting for huge textes
-│   └── test_data/        # Inner folder with test samples
-├── sorting               # Self-written sorting functions, include qsort, bubsort, mergesort
+├── с/                    # исходники
+├── h/                    # исходники
+├── unit-tests/           # случайные тесты
+│   └── c/
+│   └── h/
+├── compile.sh             # скрипт компиляции
+├── main.cpp               # пример использования, run тестов
+├── result.html            # графический дамп работы тестов
 ```
 
 # BRIEF
 
-АА короче вот есть список и получается что на самом деле он не нулевой изначально а с головой на которой он закольцован, можно добавлять убирать элементы из конца и начала это реализуется просто вставкой после tail/head и котороче можно еще по индексу вставлять либо отдельные элементы без сдвига массива, но это даже не главная цель, можно вставлять целые подсписки которые вот так выглядят.
+Реализована структура данных связный список на индексах, тесты к ней, а также графический dump с использованием graph_phys.
+Ошибки выводятся терминал согласно их кодам.
 
-Есть папка с юнит тестами, в которых есть присетнутые юнит тесты а также рандомные, после каждого юнит теста выводится вывод в формате html
+# FUNCTIONS
+
+```text
+├── HandleListConstruct_list_handlers  (list_struct * list)                                     #конструктор
+├── HandleDestruct_list_handlers       (list_struct * list)                                     #деструктор
+├── HandleListPush_list_handlers       (list_struct * list, int value)                          #добавление элемента в конец списка
+├── HandleListPop_list_handlers        (list_struct * list, int * gotten_val)                   #удаление элемента из конца списка
+├── HandleInsertByIndex_list_handlers  (list_struct * list, size_t index, int value)            #вставка элемента по индексу
+├── HandlePullElByIndex_list_handles   (list_struct * list, size_t index, int * gotten_val)     #удаление+получение элемента по индексу
+```
+
+смотри /c/list_handlers
+
+# LAUNCH
+
+```text
+./compile.sh && ./main
+```

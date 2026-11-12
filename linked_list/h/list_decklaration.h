@@ -31,5 +31,4 @@ struct list_struct {
 const size_t LIST_CAPACITY = 16;
 
 
-
 #endif
