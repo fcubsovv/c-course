@@ -1,4 +1,7 @@
 #include "../h/list_dumpers.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 LIST_ERRORS ListElDump_list_dumpers(list_elem * list_elem) {
     printf("LIST EL VALUE: %d\n", list_elem->el_value);
@@ -53,8 +56,7 @@ LIST_ERRORS CreateGraphFile_list_dumpers(list_struct * list) {
             fprintf(fileopen, "Node%zu -> Node%zu [color=blue];\n", i, current.next_index);
         }
     }
-    list_elem current = 0;
-     for (size_t i = 0; i < list->length; i++) {
+     for (size_t i = 0; i < list->length+1; i++) {
         list_elem current = list->buffer[i];
         fprintf(fileopen, "Node%zu -> Node%d [color=gray, style=dashed];\n", i, current.prev_index);
     }
@@ -62,5 +64,29 @@ LIST_ERRORS CreateGraphFile_list_dumpers(list_struct * list) {
 
     fprintf(fileopen, "}\n");
     fclose(fileopen);
+    return allright_list;
+}
+
+LIST_ERRORS GenerateTestsHtmlFile(test_params push_pop_test, test_params insert_pull_test) {
+    printf("exp res %s\n", push_pop_test.expected_result);
+    FILE * fileopen = fopen("results.html", "w");
+    if(fileopen == NULL) return cannot_open_file;
+
+    fprintf(fileopen, "<h1> LIST DUMP RESULTS </h1>\n");
+    fprintf(fileopen, "<h2> TESTS' DUMP </h2>\n");
+
+    fprintf(fileopen, "<h3> RANDOM PUSH-POP-TEST result: %d</h3>\n", push_pop_test.res_code);
+    fprintf(fileopen, "<h3> RANDOM PUSH-POP-TEST expected: %s</h3>\n", push_pop_test.expected_result);
+    fprintf(fileopen, "<h3> RANDOM PUSH-POP-TEST LIST DUMP: </h3>\n");
+    fprintf(fileopen, "<img src=\"%s\"/>\n", push_pop_test.filename);
+
+    fprintf(fileopen, "<h3> RANDOM INSERT_PULL-TEST result: %d</h3>\n", insert_pull_test.res_code);
+    fprintf(fileopen, "<h3> RANDOM INSERT_PULL-TEST expected: %s</h3>\n", insert_pull_test.expected_result);
+    fprintf(fileopen, "<h3> RANDOM INSERT_PULL-TEST LIST DUMP: </h3>\n");
+    fprintf(fileopen, "<img src=\"%s\"/>\n", insert_pull_test.filename);
+
+
+
+
     return allright_list;
 }

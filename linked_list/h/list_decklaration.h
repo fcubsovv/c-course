@@ -10,6 +10,7 @@ enum LIST_ERRORS {
     cannot_open_file = -1,
     pop_empty_list = -2,
     tryind_insert_beyond_limits = -3,
+    error_getting_memory = -4,
     allright_list = 0,
 };
 

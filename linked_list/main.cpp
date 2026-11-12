@@ -1,17 +1,17 @@
 #include "h/list_handlers.h"
 #include "h/list_dumpers.h"
+#include "unit-tests/h/tests.h"
+#include "unit-tests/h/test_info.h"
 
 int main() {
-    list_struct myFirstList = {};
-    HandleListConstruct_list_handlers(&myFirstList);
-    HandleListPush_list_handlers(&myFirstList, 1);
-    HandleListPush_list_handlers(&myFirstList, 2);
-    HandleListPush_list_handlers(&myFirstList, 67);
-    HandleListPush_list_handlers(&myFirstList, 4);
-    HandleListPush_list_handlers(&myFirstList, 5);
-    HandleInsertByIndex_list_handlers   (&myFirstList, 0 , -12);
-    HandleInsertByIndex_list_handlers   (&myFirstList, 3 , -12);
-    CreateGraphFile_list_dumpers(&myFirstList);
+
+    test_params frst = RunRundomPushPopTest();
+    const char * command1 = "dot -Tpng graph.dot -o scheme1.png";
+    int status1 = system(command1);
+    test_params secnd = RunRandomInsertByIdxTest();
+    const char * command2 = "dot -Tpng graph.dot -o scheme2.png";
+    int status2 = system(command2);
+    GenerateTestsHtmlFile(frst, secnd);
 
 
 }
