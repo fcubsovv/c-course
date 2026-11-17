@@ -1,6 +1,14 @@
 #include "../h/test_dumpers.h"
 
-LIST_ERRORS GenerateTestsHtmlFile(test_params push_pop_test, test_params insert_pull_test) {
+LIST_ERRORS GenerateTestsHtmlFile() {
+
+    test_params push_pop_test = RunRundomPushPopTest();
+    const char * command1 = "dot -Tpng graph.dot -o scheme1.png";
+    int status1 = system(command1);
+    test_params insert_pull_test = RunRandomInsertByIdxTest();
+    const char * command2 = "dot -Tpng graph.dot -o scheme2.png";
+    int status2 = system(command2);
+
     FILE * fileopen = fopen("results.html", "w");
     if(fileopen == NULL) return cannot_open_file;
 

@@ -15,6 +15,7 @@ LIST_ERRORS ListVerify(list_struct * list) {
     if (count != list->length) return extra_el_in_list;
     if (current_index != list->tail) return tail_error;
 
+    if(list->buffer[0].el_value != POISON_VAL) return head_val_error;
 
     size_t free = 0;
     for (size_t free_index = list->empty_head; free_index != 0; free_index = list->buffer[free_index].next_index){
@@ -23,6 +24,6 @@ LIST_ERRORS ListVerify(list_struct * list) {
         if(free >= list->capacity) return error_capacity;
     }
 
-    if (free + list->length + 1 == list->capacity) return error_capacity;
+    if (free + list->length + 1 != list->capacity) return error_capacity;
     return allright_list;
 }

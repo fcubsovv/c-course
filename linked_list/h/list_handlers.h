@@ -1,6 +1,7 @@
 #ifndef LIST_HANDLERS
 #define LIST_HANDLERS
 #include "list_decklaration.h"
+#include "errors.h"
 
 LIST_ERRORS HandleListConstruct_list_handlers (list_struct * list);//+
 

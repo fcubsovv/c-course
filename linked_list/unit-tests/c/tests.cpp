@@ -1,9 +1,8 @@
 #include "../h/tests.h"
-#define GETNAME(x) #x
 
 list_struct CreateRundomList() {
     list_struct list = {};
-    HandleListConstruct_list_handlers(&list);
+    DisplayListError(HandleListConstruct_list_handlers(&list));
 
     size_t num_of_tests = (rand() % (16 - 0 + 1)) + 0;
     int * command_args = (int *) calloc(sizeof(int), num_of_tests);
@@ -20,6 +19,7 @@ list_struct CreateRundomList() {
     for (size_t i = 0; i < num_of_tests; i++) {
         if (command_args[i] == 0) {
             LIST_ERRORS err = HandleListPop_list_handlers(&list, &val);
+            DisplayListError(err);
             if (err == allright_list && current_answer_index != 0) {
                 current_answer_index--;
                 test_answer[current_answer_index] = 0;
@@ -28,6 +28,7 @@ list_struct CreateRundomList() {
         }
         else {
             LIST_ERRORS err = HandleListPush_list_handlers(&list, command_args[i]);
+            DisplayListError(err);
             if (err == allright_list) {
                 test_answer[current_answer_index] = command_args[i];
                 current_answer_index++;
@@ -42,8 +43,8 @@ list_struct CreateRundomList() {
 
 test_params RunRundomPushPopTest () {
     list_struct list = {};
-    HandleListConstruct_list_handlers(&list);
-
+    DisplayListError(HandleListConstruct_list_handlers(&list));
+    DisplayListError(ListVerify(&list));
 
     size_t num_of_tests = (rand() % (32 - 0 + 1)) + 0;
     int * command_args = (int *) calloc(sizeof(int), num_of_tests);
@@ -61,6 +62,8 @@ test_params RunRundomPushPopTest () {
     for (size_t i = 0; i < num_of_tests; i++) {
         if (command_args[i] == 0) {
             LIST_ERRORS err = HandleListPop_list_handlers(&list, &val);
+            DisplayListError(err);
+            DisplayListError(ListVerify(&list));
             if (err == allright_list && current_answer_index != 0) {
                 current_answer_index--;
                 test_answer[current_answer_index] = 0;
@@ -69,6 +72,8 @@ test_params RunRundomPushPopTest () {
         }
         else {
             LIST_ERRORS err = HandleListPush_list_handlers(&list, command_args[i]);
+            DisplayListError(err);
+            DisplayListError(ListVerify(&list));
             if (err == allright_list) {
                 test_answer[current_answer_index] = command_args[i];
                 current_answer_index++;
@@ -115,8 +120,8 @@ test_params RunRundomPushPopTest () {
         res_code = error_in_push_pop;
     }
     result.res_code = res_code;
-    CreateGraphFile_list_dumpers(&list);
-    HandleDestruct_list_handlers(&list);
+    DisplayListError(CreateGraphFile_list_dumpers(&list));
+    DisplayListError(HandleDestruct_list_handlers(&list));
     free(command_args);
     free(test_answer);
 
@@ -125,6 +130,7 @@ test_params RunRundomPushPopTest () {
 
 test_params RunRandomInsertByIdxTest() {
     list_struct list = CreateRundomList();
+    DisplayListError(ListVerify(&list));
 
     size_t index = 0;
     int val = 0;
@@ -135,17 +141,17 @@ test_params RunRandomInsertByIdxTest() {
 
     for (size_t i = 0; i < num_of_tests; i++) {
         command_args[i] = (rand() % (100 - (-100) + 1)) - 100;
-
-
         if ( command_args[i] >=0 ) {
-        index = (rand() % (list.length + 1));
-        indexes[i] = index;
-        HandleInsertByIndex_list_handlers(&list, index, command_args[i]);
+            index = (rand() % (list.length + 1));
+            indexes[i] = index;
+            DisplayListError(HandleInsertByIndex_list_handlers(&list, index, command_args[i]));
+            DisplayListError(ListVerify(&list));
         } else {
-        if (list.length == 0) continue;
-        index = list.length ? rand() % list.length : 0;
-        indexes[i] = index;
-        HandlePullElByIndex_list_handles(&list, index, &val);
+            if (list.length == 0) continue;
+            index = list.length ? rand() % list.length : 0;
+            indexes[i] = index;
+            DisplayListError(HandlePullElByIndex_list_handles(&list, index, &val));
+            DisplayListError(ListVerify(&list));
         }
 
     }
@@ -160,10 +166,8 @@ test_params RunRandomInsertByIdxTest() {
         offset += written;
     }
 
-
-
-    CreateGraphFile_list_dumpers(&list);
-    HandleDestruct_list_handlers(&list);
+    DisplayListError(CreateGraphFile_list_dumpers(&list));
+    DisplayListError(HandleDestruct_list_handlers(&list));
     free(command_args);
     free(indexes);
     return {list_test_allright, str, "scheme2.png"};

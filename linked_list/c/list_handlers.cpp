@@ -1,11 +1,43 @@
 #include "../h/list_handlers.h"
 
+//______________________________________________________________________________________________________________________________________
+
+static LIST_ERRORS ExpandList(list_struct * list) {
+    if (list->length + 1 < list->capacity) return allright_list;
+    size_t old_capacity = list->capacity;
+    size_t new_capacity = old_capacity*2;
+
+    list_elem * arr = (list_elem *)realloc(list->buffer, new_capacity * sizeof(list_elem));
+    if (arr == NULL) return error_getting_memory;
+
+    list->buffer = arr;
+    list->capacity = new_capacity;
+
+    for (size_t i = old_capacity; i < new_capacity; i++) {
+        list->buffer[i].el_value = POISON_VAL;
+        list->buffer[i].prev_index = FREE;
+        list->buffer[i].next_index = (i + 1) % new_capacity;
+    }
+    list->empty_head = old_capacity;
+    return allright_list;
+}
+
+static size_t FindCurrentIndex(list_struct * list, size_t index) {
+     size_t current_idx_in_buffer = 0;
+    for (size_t i = 0; i <= index; i++) current_idx_in_buffer = list->buffer[current_idx_in_buffer].next_index;
+    return current_idx_in_buffer;
+}
+
+//____________________________________________________________________________________________________________________________________________________________________
 
 LIST_ERRORS HandleListConstruct_list_handlers   (list_struct * list) {
     list->capacity = LIST_CAPACITY;
 
     list_elem * arr = (list_elem*)calloc(sizeof(list_elem), list->capacity);
-    if (arr == NULL) return error_getting_memory;
+    if (arr == NULL) {
+        DisplayListError(error_getting_memory);
+        return error_getting_memory;
+    };
     list->buffer = arr;
     list->buffer[0] = {};
     list->buffer[0].el_value = POISON_VAL;
@@ -14,25 +46,14 @@ LIST_ERRORS HandleListConstruct_list_handlers   (list_struct * list) {
     for (size_t i = 1; i < LIST_CAPACITY; i++) {
         list->buffer[i].next_index = (i+1)%list->capacity;
         list->buffer[i].prev_index = FREE;
+        list->buffer[i].el_value = POISON_VAL;
     }
     list->length = 0;
     return allright_list;
 }
 
 LIST_ERRORS HandleListPush_list_handlers        (list_struct * list, int value) {
-    size_t old_capacity = list->capacity;
-    if (old_capacity == list->length+1) {
-        size_t new_capacity = old_capacity*2;
-        list_elem * newarr = (list_elem *)realloc(list->buffer, new_capacity*sizeof(list_elem));
-        if (newarr == NULL) return error_getting_memory;
-        list->capacity = new_capacity;
-        list->buffer = newarr;
-        for (size_t i = old_capacity; i < new_capacity; i++) {
-            list->buffer[i].prev_index = FREE;
-            list->buffer[i].next_index = (i + 1) % new_capacity;
-        }
-        list->empty_head = old_capacity;
-    }
+    DisplayListError(ExpandList(list));
     size_t empty_head = list->empty_head;
     list->empty_head = list->buffer[list->empty_head].next_index;
     size_t old_tail = list->tail;
@@ -57,37 +78,20 @@ LIST_ERRORS HandleListPop_list_handlers         (list_struct * list, int * gotte
     list->empty_head = old_tail;
     list->buffer[list->empty_head].next_index = old_empty_head;
     list->buffer[list->empty_head].prev_index = FREE;
-    list->buffer[list->empty_head].el_value = 0;
+    list->buffer[list->empty_head].el_value = POISON_VAL;
     list->length--;
     return allright_list;
 }
 
 LIST_ERRORS HandleInsertByIndex_list_handlers   (list_struct * list, size_t index, int value) {
+
+    if(index > list->length) return tryind_insert_beyond_limits;
+    ExpandList(list);
+
     if (index == list->length) return HandleListPush_list_handlers(list, value);
 
-    if(index > list->length) {
-        return tryind_insert_beyond_limits;
-    }
+    size_t current_idx_in_buffer = FindCurrentIndex(list, index);
 
-    size_t old_capacity = list->capacity;
-
-    if (old_capacity == list->length+1) {
-        size_t new_capacity = old_capacity*2;
-        list_elem * newarr = (list_elem *)realloc(list->buffer, new_capacity*sizeof(list_elem));
-        if (newarr == NULL) return error_getting_memory;
-        list->capacity = new_capacity;
-        list->buffer = newarr;
-        for (size_t i = old_capacity; i < new_capacity; i++) {
-            list->buffer[i].prev_index = FREE;
-            list->buffer[i].next_index = (i + 1) % new_capacity;
-        }
-        list->empty_head = old_capacity;
-    }
-
-    size_t current_idx_in_buffer = 0;
-    for (size_t i = 0; i <= index; i++) {
-        current_idx_in_buffer = list->buffer[current_idx_in_buffer].next_index;
-    }
 
     size_t empty_el = list->empty_head;
     size_t prev_idx = list->buffer[current_idx_in_buffer].prev_index;
@@ -105,14 +109,12 @@ LIST_ERRORS HandleInsertByIndex_list_handlers   (list_struct * list, size_t inde
 }
 
 LIST_ERRORS HandlePullElByIndex_list_handles    (list_struct * list, size_t index, int * gotten_val) {
-    size_t current_idx_in_buffer = 0;
     if (index >= list->length) return pulling_beyond_limits;
 
-    for (size_t i = 0; i <= index; i++) {
-        current_idx_in_buffer = list->buffer[current_idx_in_buffer].next_index;
-    }
+    size_t current_idx_in_buffer = FindCurrentIndex(list, index);
 
     *gotten_val = list->buffer[current_idx_in_buffer].el_value;
+    list->buffer[current_idx_in_buffer].el_value = POISON_VAL;
     size_t prev_el_idx = list->buffer[current_idx_in_buffer].prev_index;
     if (current_idx_in_buffer == list->tail) list->tail = prev_el_idx;
 
@@ -137,7 +139,7 @@ LIST_ERRORS HandleDestruct_list_handlers        (list_struct * list) {
     list->capacity = 0;
     list->tail = 0;
     list->empty_head = 0;
-    free(list->buffer);//error
+    free(list->buffer);
     list->buffer = NULL;
 
     return allright_list;

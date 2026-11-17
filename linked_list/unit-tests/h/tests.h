@@ -1,7 +1,7 @@
 #include "../../h/list_handlers.h"
-#include "test_dumpers.h"
 #include "../../h/list_dumpers.h"
 #include "../h/test_info.h"
+#include "../../h/list_decklaration.h"
 
 #include <stdio.h>
 #include <stdlib.h>
