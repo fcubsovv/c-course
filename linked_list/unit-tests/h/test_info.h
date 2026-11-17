@@ -1,5 +1,7 @@
 #ifndef TEST_INFO
 #define TEST_INFO
+
+
 enum LIST_TEST_RESULTS {
     list_test_allright = 0,
     list_test_unexpected_res = -1,

@@ -4,7 +4,6 @@
 list_struct CreateRundomList() {
     list_struct list = {};
     HandleListConstruct_list_handlers(&list);
-    srand(time(NULL));
 
     size_t num_of_tests = (rand() % (16 - 0 + 1)) + 0;
     int * command_args = (int *) calloc(sizeof(int), num_of_tests);
@@ -35,19 +34,16 @@ list_struct CreateRundomList() {
             }
         }
     }
-
+    free(test_answer);
+    free(command_args);
 
     return list;
 }
 
-//тест создает рандомный список целых числел длиной от 0 до 32
-//потом создает массив целых чисел случайных в диапазоне целых числел. Все нули - pop,
-//остальные - пуши. Вероятность нуля >~ 30%
 test_params RunRundomPushPopTest () {
     list_struct list = {};
     HandleListConstruct_list_handlers(&list);
 
-    srand(time(NULL));
 
     size_t num_of_tests = (rand() % (32 - 0 + 1)) + 0;
     int * command_args = (int *) calloc(sizeof(int), num_of_tests);
@@ -83,7 +79,6 @@ test_params RunRundomPushPopTest () {
     int n = num_of_tests;
 
     char * str = (char *) calloc(256, sizeof(char));
-    char * str_ptr = str;
     int offset = 0;
 
     for (int i = 0; i < n; i++) {
@@ -121,50 +116,55 @@ test_params RunRundomPushPopTest () {
     }
     result.res_code = res_code;
     CreateGraphFile_list_dumpers(&list);
+    HandleDestruct_list_handlers(&list);
     free(command_args);
     free(test_answer);
 
     return result;
 }
-//тест создает рандомный list
-//потом создает массив комманд и индексов, если число больше нуля - оно вставляется по индексу, если меньше нуля - выполняется pull по этому индексу
+
 test_params RunRandomInsertByIdxTest() {
     list_struct list = CreateRundomList();
 
-
-    srand(time(NULL));
     size_t index = 0;
     int val = 0;
     size_t num_of_tests = (rand() % (8 - 0 + 1)) + 0;
-    printf("%d\n", num_of_tests);
+    printf("%zu\n", num_of_tests);
     int * command_args = (int *) calloc(sizeof(int), num_of_tests);
     int * indexes = (int *) calloc(sizeof(int), num_of_tests);
 
     for (size_t i = 0; i < num_of_tests; i++) {
         command_args[i] = (rand() % (100 - (-100) + 1)) - 100;
-        index = (rand() % (list.length - 1));
+
+
+        if ( command_args[i] >=0 ) {
+        index = (rand() % (list.length + 1));
         indexes[i] = index;
-        if ( command_args[i] >=0 ) HandleInsertByIndex_list_handlers(&list, index, command_args[i]);
-        else HandlePullElByIndex_list_handles(&list, index, &val);
+        HandleInsertByIndex_list_handlers(&list, index, command_args[i]);
+        } else {
+        if (list.length == 0) continue;
+        index = list.length ? rand() % list.length : 0;
+        indexes[i] = index;
+        HandlePullElByIndex_list_handles(&list, index, &val);
+        }
+
     }
     int n = num_of_tests;
 
     char * str = (char *) calloc(256, sizeof(char));
-    char * str_ptr = str;
-    int offset = 0;
+    size_t offset = 0;
 
     for (int i = 0; i < n; i++) {
         int written = snprintf(str + offset, 256 - offset, "(%d, %d)", command_args[i], indexes[i]);
-
-        if (written < 0) {
-            break;
-        }
+        if (written < 0 || (size_t)written >= 256 - offset) break;
         offset += written;
     }
 
 
 
     CreateGraphFile_list_dumpers(&list);
+    HandleDestruct_list_handlers(&list);
     free(command_args);
+    free(indexes);
     return {list_test_allright, str, "scheme2.png"};
 }

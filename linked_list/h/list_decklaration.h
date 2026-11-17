@@ -11,6 +11,12 @@ enum LIST_ERRORS {
     pop_empty_list = -2,
     tryind_insert_beyond_limits = -3,
     error_getting_memory = -4,
+    pulling_beyond_limits = -5,
+    extra_el_in_list = -6,
+    prev_next_error = -7,
+    tail_error = -8,
+    error_prev_in_free_el = -9,
+    error_capacity = -10,
     allright_list = 0,
 };
 

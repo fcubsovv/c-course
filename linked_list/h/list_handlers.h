@@ -12,7 +12,5 @@ LIST_ERRORS HandleInsertByIndex_list_handlers (list_struct * list_struct, size_t
 
 LIST_ERRORS HandlePullElByIndex_list_handles (list_struct * list, size_t index, int * gotten_val);
 
-LIST_ERRORS HandleInsertSublist_list_handles (list_struct * main_list, list_struct * sublist);
-
-
+LIST_ERRORS HandleDestruct_list_handlers        (list_struct * list);
 #endif
