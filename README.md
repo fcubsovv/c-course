@@ -11,6 +11,9 @@ C course made by DED, based on project-way thinking
 ├── onegin/               # ONEGIN: Optimizing line sorting for huge textes
 │   └── test_data/        # Inner folder with test samples
 ├── sorting               # Self-written sorting functions, include qsort, bubsort, mergesort
+├── CPU                   # Virtual CPU
+├── linked_list           # Linked list data structure
+├── Akinator              # Binary tree data structure, recursive reader
 ```
 
 ## 🚀 QUICK START
