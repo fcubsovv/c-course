@@ -1,11 +1,50 @@
 #include "../h/akinator-modes.h"
-#include <cstdlib>
-#include <cstring>
 
-static AKINATOR_TREE_ERRORS GetUserAnswer           (char * line) {
-    scanf(" %127[^\n]", line);
-    return akinator_allright;
+
+//__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+AKINATOR_TREE_ERRORS AkinatorPuts (const char * description, GAME_TYPE mode) {
+    Font customFont = GetAkinatorFont();
+    if (description == NULL) return null_ptr_to_line;
+    Vector2 qTextSize = MeasureTextEx(customFont, description, 26, 1);
+    Rectangle questionBox = { AKINATOR_BUTTON_RIGHT_POS, 50, AKINATOR_BUTTON_WIDTH, 100 };
+    switch(mode) {
+        case akinator_terminal_game:
+            puts(description);
+            return akinator_allright;
+        case akinator_visual_game:
+            DrawRectangleRounded((Rectangle){ questionBox.x + 4, questionBox.y + 4, questionBox.width, questionBox.height }, 0.25f, 12, Fade(BLACK, 0.3f));
+            DrawRectangleRounded(questionBox, 0.25f, 12, akinator_parchmentBg);
+            DrawRectangleRoundedLinesEx(questionBox, 0.25f, 12, 3.0f, akinator_borderBrown);
+            DrawTextEx(
+                customFont,
+                description,
+                (Vector2){ questionBox.x + (questionBox.width - qTextSize.x) / 2, questionBox.y + (questionBox.height - qTextSize.y) / 2 },
+                26, 1, akinator_borderBrown
+            );
+            return akinator_allright;
+        default:
+            return invalid_game_type;
+    }
+    return invalid_game_type;
 }
+
+
+AKINATOR_TREE_ERRORS GetUserAnswer                  (char * line, GAME_TYPE mode) {
+    if (mode == akinator_terminal_game) {
+        scanf(" %127[^\n]", line);
+        return akinator_allright;
+    }
+    else if (mode == akinator_visual_game) {
+        //idk
+        return akinator_allright;
+    }
+
+    return invalid_game_type;
+}
+
+//**************************************************************************************************************************************************************************************************************
+
 
 static Node * InnerSearchOfCharacter                (Node * TreeNode, char * character) {
     if (TreeNode->left == NULL && TreeNode->right == NULL) {
@@ -24,7 +63,7 @@ static Node * InnerSearchOfCharacter                (Node * TreeNode, char * cha
     return NULL;
 }
 
-static int GetTreeDebt (Node * TreeNode) {
+static int GetTreeDebt                              (Node * TreeNode) {
     int depth = 0;
     while (TreeNode->parent != NULL) { TreeNode = TreeNode->parent; depth++; }
     return depth;
@@ -45,7 +84,7 @@ static AKINATOR_TREE_ERRORS GetNodeDescription      (Node * RootNode, Node * Tre
     return GetNodeDescription(RootNode, Parent, description);
 }
 
-static Node * FindCommonNode ( Node * TreeNodeFirst, Node * TreeNodeSecond ) {
+static Node * FindCommonNode                        (Node * TreeNodeFirst, Node * TreeNodeSecond ) {
     if (TreeNodeFirst == NULL) return NULL;
     if (TreeNodeSecond == NULL) return NULL;
 
@@ -93,69 +132,70 @@ static AKINATOR_TREE_ERRORS CompareNodes            (Node * TreeNodeFirst, Node 
     return akinator_allright;
 }
 
-static AKINATOR_TREE_ERRORS FindOutCharacterInner   (Node * TreeNode, char * line, Node ** found_node) {
+static AKINATOR_TREE_ERRORS FindOutCharacterInner   (Node * TreeNode, char * line, Node ** found_node, GAME_TYPE mode) {
     if (TreeNode == NULL) return null_ptr_to_node;
 
-    puts(TreeNode->message);
+    AkinatorPuts(TreeNode->message, mode);
     if (TreeNode->left == NULL && TreeNode->right == NULL) {
         *found_node = TreeNode;
-        return choose_game_mode;
+        return akinator_choose_mode;
     }
 
-    GetUserAnswer(line);
+    GetUserAnswer(line, mode);
 
     if (strcmp(line, POSITIVE_ANS) == 0) {
         if (TreeNode->right) {
-            FindOutCharacterInner(TreeNode->right, line, found_node);
+            FindOutCharacterInner(TreeNode->right, line, found_node, mode);
         }
         else {
-            puts("no way from positive");
+            AkinatorPuts("no way from positive", mode);
             return null_ptr_to_node;
         }
     }
     else if (strcmp(line, NEGATIVE_ANS) == 0) {
         if (TreeNode->left) {
-            FindOutCharacterInner(TreeNode->left, line, found_node);
+            FindOutCharacterInner(TreeNode->left, line, found_node, mode);
         }
         else {
-            puts("no way from negative answer");
+            AkinatorPuts("no way from negative answer", mode);
             return null_ptr_to_node;
         }
 
     }
     else {
-        puts("invalid answer");
+        AkinatorPuts("invalid answer", mode);
         return invalid_user_input;
     }
 
     return unexpected_behavior;
 }
 
-//________________________________________________________________________________________________________________________________________________________
+//*************************************************************************************************************************************************************************************************************************************
 
-AKINATOR_TREE_ERRORS HandleDescribingCharacterMode  (Node * TreeNode, char * line) {
+
+AKINATOR_TREE_ERRORS HandleDescribingCharacterMode  (Node * TreeNode, char * line, GAME_TYPE mode) {
     char * description = (char *) calloc (512, sizeof(char));
-    GetUserAnswer(line);
+    GetUserAnswer(line, mode);
     Node * CurNode  = {};
     CurNode = InnerSearchOfCharacter(TreeNode, line);
     GetNodeDescription(TreeNode, CurNode, description);
-    puts(description);
-    return unexpected_behavior;
+    AkinatorPuts(description, mode);
+    return akinator_choose_mode;
 }
 
-AKINATOR_TREE_ERRORS HandleAddCharacterMode         (Node * TreeNode, char * line) {
+AKINATOR_TREE_ERRORS HandleAddCharacterMode         (Node * TreeNode, char * line, GAME_TYPE mode) {
     Node * leaf_node = NULL;
-    FindOutCharacterInner(TreeNode, line, &leaf_node);
-    puts("is it correct?");
-    GetUserAnswer(line);
+    FindOutCharacterInner(TreeNode, line, &leaf_node, mode);
+    AkinatorPuts("is it correct?", mode);
+    GetUserAnswer(line, mode);
     if(strcmp(line, NEGATIVE_ANS) == 0) {
 
-        puts("do you want to add your character?");
-        GetUserAnswer(line);
+        AkinatorPuts("do you want to add your character?", mode);
+        GetUserAnswer(line, mode);
         if ( strcmp(line, NEGATIVE_ANS) == 0) return akinator_allright;
         else if (strcmp(line, POSITIVE_ANS) == 0) {
-            puts("how feature for you character is true and for characher above is false");
-            GetUserAnswer(line);
+            AkinatorPuts("how feature for you character is true and for characher above is false", mode);
+            GetUserAnswer(line, mode);
             Node * parent_node = leaf_node->parent;
                 if (parent_node != NULL && parent_node->left == leaf_node) {
 
@@ -168,8 +208,8 @@ AKINATOR_TREE_ERRORS HandleAddCharacterMode         (Node * TreeNode, char * lin
                     NewNode->identifier = HashString(NewNode->message);
                     NewNode->left = leaf_node;
 
-                    puts("what is the name of your character");
-                    GetUserAnswer(line);
+                    AkinatorPuts("what is the name of your character", mode);
+                    GetUserAnswer(line, mode);
                     Node * NewCharNode = (Node *)calloc(1, sizeof(Node));
 
                     snprintf( NewCharNode->message, sizeof( NewCharNode->message), "%s", line);
@@ -185,8 +225,8 @@ AKINATOR_TREE_ERRORS HandleAddCharacterMode         (Node * TreeNode, char * lin
                     snprintf( NewNode->message, sizeof( NewNode->message), "%s", line);
                     NewNode->identifier = HashString(NewNode->message);
                     NewNode->left = leaf_node;
-                    puts("what is the name of your character");
-                    GetUserAnswer(line);
+                    AkinatorPuts("what is the name of your character", mode);
+                    GetUserAnswer(line, mode);
                     Node * NewCharNode = (Node *)calloc(1, sizeof(Node));
 
                     snprintf( NewCharNode->message, sizeof( NewCharNode->message), "%s", line);
@@ -202,8 +242,8 @@ AKINATOR_TREE_ERRORS HandleAddCharacterMode         (Node * TreeNode, char * lin
                     snprintf( NewNode->message, sizeof( NewNode->message), "%s", line);
                     NewNode->identifier = HashString(NewNode->message);
                     NewNode->left = leaf_node;
-                    puts("what is the name of your character");
-                    GetUserAnswer(line);
+                    AkinatorPuts("what is the name of your character", mode);
+                    GetUserAnswer(line, mode);
                     Node * NewCharNode = (Node *)calloc(1, sizeof(Node));
 
                     snprintf( NewCharNode->message, sizeof( NewCharNode->message), "%s", line);
@@ -214,37 +254,49 @@ AKINATOR_TREE_ERRORS HandleAddCharacterMode         (Node * TreeNode, char * lin
 
                 }
         } else {
-            puts("invalid answer");
+            AkinatorPuts("invalid answer", mode);
             return akinator_allright;
         }
 
 
     }
-    return akinator_allright;
+    return akinator_choose_mode;
 }
 
-AKINATOR_TREE_ERRORS HandleCompareCharactersMode    (Node * TreeNode, char * line) {
+AKINATOR_TREE_ERRORS HandleCompareCharactersMode    (Node * TreeNode, char * line, GAME_TYPE mode) {
 
-    puts("what is the name of the first character");
-    GetUserAnswer(line);
+    AkinatorPuts("what is the name of the first character", mode);
+
+    GetUserAnswer(line, mode);
+
     Node * CurNode1 = (Node *)calloc(1, sizeof(Node));
     CurNode1 = InnerSearchOfCharacter(TreeNode, line);
     if (CurNode1 == NULL) return null_ptr_to_node;
-    puts("what is the name of the second character");
-    GetUserAnswer(line);
+
+    AkinatorPuts("what is the name of the second character", mode);
+
+    GetUserAnswer(line, mode);
+
     Node * CurNode2 = (Node *)calloc(1, sizeof(Node));
     CurNode2 = InnerSearchOfCharacter(TreeNode, line);
-    if (CurNode2 == NULL) return null_ptr_to_node;
-    CompareNodes(CurNode1, CurNode2, line);
-    puts(line);
 
-    return akinator_allright;
+    if (CurNode2 == NULL) return null_ptr_to_node;
+
+    CompareNodes(CurNode1, CurNode2, line);
+
+    AkinatorPuts(line, mode);
+
+    return akinator_choose_mode;
 }
 
-AKINATOR_TREE_ERRORS HandleGameModes(Node * TreeNode, AKINATOR_GAME_MODES MODE) {
+//________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+AKINATOR_TREE_ERRORS HandleGameModes                (Node * TreeNode, AKINATOR_TREE_ERRORS MODE, GAME_TYPE mode) {
 
     char * answer = (char *) calloc (512, sizeof(char));
-    AKINATOR_MODES_HANDLERS[MODE-1].handler(TreeNode, answer);
+    AKINATOR_MODES_HANDLERS[MODE-1].handler(TreeNode, answer, mode);
+
+    free(answer);
 
     return akinator_allright;
 }
